@@ -1,0 +1,28 @@
+[project]
+name = "ai-employees"
+version = "0.1.0"
+description = "AI employees: role-scoped agents with task queues, approval gates, and auditable journals"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+agent = [
+    "claude-agent-sdk>=0.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ai_employees"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

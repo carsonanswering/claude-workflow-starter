@@ -1,0 +1,148 @@
+<title>Open Items</title>
+<style>
+  :root {
+    --bg: #f4f6f7; --surface: #ffffff; --line: #dde3e6;
+    --ink: #1c2b30; --muted: #5c7076; --faint: #8fa0a5;
+    --accent: #1f7a6d;
+    --busy: #a36a00; --busy-bg: #f7ecd4;
+    --idle-bg: #e8edee;
+    --good: #24734a; --good-bg: #ddeee3;
+    --bad: #a63a32; --bad-bg: #f5e0de;
+    --stale: #6b5e8f; --stale-bg: #e9e5f2;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root {
+    --bg: #10161a; --surface: #171f24; --line: #263238;
+    --ink: #dce6e8; --muted: #91a4aa; --faint: #61757b;
+    --accent: #3aa896;
+    --busy: #e0a93e; --busy-bg: #33290f;
+    --idle-bg: #1f2a2f;
+    --good: #55b380; --good-bg: #142b1f;
+    --bad: #d97066; --bad-bg: #331715;
+    --stale: #a394cf; --stale-bg: #241f33;
+  } }
+  :root[data-theme="light"] {
+    --bg: #f4f6f7; --surface: #ffffff; --line: #dde3e6;
+    --ink: #1c2b30; --muted: #5c7076; --faint: #8fa0a5;
+    --accent: #1f7a6d;
+    --busy: #a36a00; --busy-bg: #f7ecd4;
+    --idle-bg: #e8edee;
+    --good: #24734a; --good-bg: #ddeee3;
+    --bad: #a63a32; --bad-bg: #f5e0de;
+    --stale: #6b5e8f; --stale-bg: #e9e5f2;
+  }
+  :root[data-theme="dark"] {
+    --bg: #10161a; --surface: #171f24; --line: #263238;
+    --ink: #dce6e8; --muted: #91a4aa; --faint: #61757b;
+    --accent: #3aa896;
+    --busy: #e0a93e; --busy-bg: #33290f;
+    --idle-bg: #1f2a2f;
+    --good: #55b380; --good-bg: #142b1f;
+    --bad: #d97066; --bad-bg: #331715;
+    --stale: #a394cf; --stale-bg: #241f33;
+  }
+  body { background: var(--bg); color: var(--ink);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0; padding: 20px; }
+  .wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 20px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+  .stamp { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  section h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); font-weight: 600; margin: 0 0 8px; display: flex; gap: 8px; align-items: baseline; }
+  section h2 .count { font-family: var(--mono); color: var(--faint); font-weight: 500; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+  .item { display: flex; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); align-items: flex-start; }
+  .item:last-child { border-bottom: 0; }
+  .item input[type=checkbox] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); flex: none; cursor: pointer; }
+  .item .body { min-width: 0; flex: 1; }
+  .item .t { font-weight: 550; font-size: 14.5px; }
+  .item .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .item .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; align-items: center; }
+  .item.done .t, .item.done .sub { text-decoration: line-through; color: var(--faint); }
+  .item.done { opacity: 0.65; }
+  .pill { display: inline-block; font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 1.5px 8px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; }
+  .pill.blocked { color: var(--bad); background: var(--bad-bg); }
+  .pill.ready { color: var(--good); background: var(--good-bg); }
+  .pill.idea { color: var(--stale); background: var(--stale-bg); }
+  .pill.effort { color: var(--muted); background: var(--idle-bg); }
+  .pill.repo { color: var(--accent); background: var(--idle-bg); font-family: var(--mono); text-transform: none; }
+  .prompt { font-family: var(--mono); font-size: 11.5px; color: var(--faint); word-break: break-all; }
+  .empty { padding: 14px; color: var(--faint); font-size: 13px; }
+  footer { color: var(--faint); font-size: 12px; line-height: 1.6; }
+  .mono { font-family: var(--mono); }
+</style>
+<div class="wrap">
+  <header>
+    <h1>Open Items</h1>
+    <div class="stamp" id="stamp"></div>
+  </header>
+  <section>
+    <h2>Waiting on you <span class="count" id="c-you"></span></h2>
+    <div class="card" id="you"></div>
+  </section>
+  <section>
+    <h2>Ready to pick up <span class="count" id="c-ready"></span></h2>
+    <div class="card" id="ready"></div>
+  </section>
+  <section>
+    <h2>Ideas <span class="count" id="c-idea"></span></h2>
+    <div class="card" id="idea"></div>
+  </section>
+  <section>
+    <h2>Blocked <span class="count" id="c-blocked"></span></h2>
+    <div class="card" id="blocked"></div>
+  </section>
+  <footer>Check-offs save on this device only (localStorage) — laptop refresh via <span class="mono">/open-items</span> rebuilds the list and clears done items it no longer includes. Paste a prompt path into a fresh Claude Code session to start an item.</footer>
+</div>
+<script>
+const D = /*__DATA__*/null;
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY = "open-items-done";
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+const ids = new Set(D.items.map(i => i.id));
+for (const k of Object.keys(done)) if (!ids.has(k)) delete done[k];
+localStorage.setItem(KEY, JSON.stringify(done));
+
+document.getElementById("stamp").textContent =
+  "refreshed " + new Date(D.updatedAt).toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
+
+function pillFor(it) {
+  if (it.section === "you") return `<span class="pill blocked">needs you</span>`;
+  if (it.section === "ready") return `<span class="pill ready">ready</span>`;
+  if (it.section === "idea") return `<span class="pill idea">idea</span>`;
+  return `<span class="pill blocked">blocked</span>`;
+}
+function render() {
+  for (const sec of ["you", "ready", "idea", "blocked"]) {
+    const items = D.items.filter(i => i.section === sec)
+      .sort((a, b) => (!!done[a.id]) - (!!done[b.id]));
+    document.getElementById("c-" + sec).textContent = items.length ? `${items.filter(i => !done[i.id]).length}/${items.length}` : "";
+    document.getElementById(sec).innerHTML = items.map(it => `
+      <div class="item ${done[it.id] ? "done" : ""}">
+        <input type="checkbox" data-id="${esc(it.id)}" ${done[it.id] ? "checked" : ""} aria-label="done: ${esc(it.title)}">
+        <div class="body">
+          <div class="t">${esc(it.title)}</div>
+          ${it.note ? `<div class="sub">${esc(it.note)}</div>` : ""}
+          <div class="meta">
+            ${pillFor(it)}
+            ${it.repo ? `<span class="pill repo">${esc(it.repo)}</span>` : ""}
+            ${it.effort ? `<span class="pill effort">${esc(it.effort)}</span>` : ""}
+            ${it.blocker ? `<span class="pill blocked">${esc(it.blocker)}</span>` : ""}
+          </div>
+          ${it.prompt ? `<div class="prompt">${esc(it.prompt)}</div>` : ""}
+        </div>
+      </div>`).join("") || `<div class="empty">Nothing here.</div>`;
+  }
+  document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.onchange = () => {
+      if (cb.checked) done[cb.dataset.id] = Date.now(); else delete done[cb.dataset.id];
+      localStorage.setItem(KEY, JSON.stringify(done));
+      render();
+    };
+  });
+}
+render();
+</script>

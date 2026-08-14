@@ -1,0 +1,24 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "answering-workflows",
+  "owner": {
+    "name": "Carson",
+    "email": "carson@answering.com"
+  },
+  "metadata": {
+    "description": "Answering.com Claude workflow suite: skills, agents, and orchestration for agent teams",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "answering-suite",
+      "source": "./plugins/answering-suite",
+      "description": "Complete workflow suite: 31 skills (incl. the Retell voice/chat agent composer and the workflow-starter orchestrator), 8 specialist subagents, plus orchestration doctrine tuned for experimental agent teams.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Carson",
+        "email": "carson@answering.com"
+      }
+    }
+  ]
+}

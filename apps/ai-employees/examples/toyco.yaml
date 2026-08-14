@@ -1,0 +1,50 @@
+name: toyco
+owner: taj.vasudeva@gmail.com          # approval requests go here
+goals:                                  # ordered, highest priority first
+  - Launch a landing page for the ToyCo waitlist
+  - Draft and send one announcement email to the beta list
+constraints:                            # injected into every employee prompt
+  - Spend $0 — free tiers only
+  - No external communication without owner approval
+  - "Tone: plainspoken, no hype"
+resources:
+  repo: github.com/taj/toyco-site
+  domain: toyco.example.com
+  email_api_key: TOYCO_RESEND_KEY       # env var name, not the secret
+
+tasks:
+  - title: Build the ToyCo waitlist landing page
+    description: >
+      Create a single static landing page for the ToyCo waitlist: headline,
+      one-paragraph pitch, email signup form (no backend — form posts nowhere
+      yet). Acceptance: page renders, copy is plainspoken, zero spend.
+    assignee_role: engineer
+    priority: 1
+
+  - title: Draft the ToyCo announcement email to the beta list
+    description: >
+      Write the announcement email for the beta list: subject line + body,
+      plainspoken tone, no hype, no unsourced claims. Sending is gated —
+      produce the draft for owner approval before anything leaves the building.
+    assignee_role: marketer
+    priority: 2
+    gate_tags: [send_external]
+
+employees:
+  - name: Eng-1
+    role: engineer
+    job_description: >
+      Build and ship ToyCo's web presence. Scope: this repo only. Quality bar:
+      tests pass, page renders. Escalate anything touching prod or data.
+    tools: [Read, Write, Edit, Bash, Grep, Glob]
+    approval_gates: [deploy_prod, delete_data]
+    max_concurrent_tasks: 1
+
+  - name: Mktr-1
+    role: marketer
+    job_description: >
+      Write ToyCo's copy and outreach. Draft freely; NOTHING leaves the building
+      without owner sign-off. Escalate pricing or claims you can't source.
+    tools: [Read, Write, WebSearch, WebFetch]
+    approval_gates: [send_external, spend_money]
+    max_concurrent_tasks: 1

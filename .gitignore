@@ -1,0 +1,22 @@
+# macOS / editor noise
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Claude Code local state (never commit personal overrides)
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+apps/ai-employees/.venv/
+
+# Skill runtime state (skills recreate these on first run)
+**/items.json
+**/state.json
+**/out/
+
+# Node
+node_modules/

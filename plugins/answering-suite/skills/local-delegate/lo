@@ -1,0 +1,411 @@
+#!/usr/bin/env python3
+"""lo — one-shot local LLM call via Ollama, for scoped delegation.
+
+Usage:
+  lo "prompt"                          # default model (q = qwen3.6:27b-mlx)
+  cat file.py | lo "summarize this"    # stdin appended as <input> context
+  lo -m fast "prompt"                  # gemma4:latest — 8B, mechanical work
+  lo -s "you are a JSON extractor" -j "..."
+  lo --check                           # preflight: server, models, aliases
+  lo --list                            # installed models + alias map
+
+Aliases: q=qwen3.6:27b-mlx  moe=qwen3.6:35b-mlx  fast=gemma4:latest  g=gemma4:31b-mlx
+Prints assistant text only (thinking stripped). Non-zero exit on every
+failure mode, each with a distinct code so callers can branch:
+  3 timeout   4 empty output   5 server down   6 model not installed
+  7 input over budget or too big for --ctx   8 output truncated   1 other
+
+Piped stdin is read automatically; a redirected file needs -i, so that a
+`while read ...; do lo ...; done < inputs` loop keeps its own input.
+"""
+import argparse
+import json
+import os
+import stat
+import sys
+import time
+import urllib.error
+import urllib.request
+
+HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+if not HOST.startswith("http"):
+    HOST = "http://" + HOST
+HOST = HOST.rstrip("/")
+
+ALIASES = {
+    "q": "qwen3.6:27b-mlx",
+    "qwen": "qwen3.6:27b-mlx",
+    "moe": "qwen3.6:35b-mlx",
+    "fast": "gemma4:latest",
+    "g": "gemma4:31b-mlx",
+    "gemma": "gemma4:31b-mlx",
+}
+
+# Local models degrade hard on long context and a 22GB model re-reading a
+# novel is slower than doing the task inline. Budget is in characters of the
+# final prompt (system + user + stdin).
+DEFAULT_MAX_INPUT = 24000
+MAX_CTX = 65536
+
+E_TIMEOUT, E_EMPTY, E_SERVER, E_MODEL, E_INPUT, E_TRUNC = 3, 4, 5, 6, 7, 8
+
+# --- append-only usage log -------------------------------------------------
+# One JSON line per invocation. Armed once we know a real call is being made;
+# from that point every exit path — including all ~10 _exit() sites, which are
+# just sys.exit — writes exactly one line via the __main__ wrapper at the
+# bottom. Never writes to stdout/stderr, never raises, never changes the exit
+# code. --list / --check / a missing prompt exit before arming: no model was
+# ever sent, so there is nothing honest to record.
+_USAGE_LOG = os.path.join(os.path.expanduser("~"), ".claude", "usage", "lo.jsonl")
+_REC = None
+_LOGGED = False
+
+
+def _log_arm(model):
+    global _REC
+    _REC = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "tool": "lo", "model": model,
+            "prompt_tokens": None, "completion_tokens": None,
+            "latency_ms": 0, "exit_code": 0}
+
+
+def _log_model(model):
+    if _REC is not None:
+        _REC["model"] = model
+
+
+def _log_latency(t0):
+    # accumulates: call() can retry (think-strip retry, and --retry)
+    if _REC is not None:
+        _REC["latency_ms"] += int((time.monotonic() - t0) * 1000)
+
+
+def _log_usage(resp):
+    # Real counts from ollama only. Absent counts stay null — a 0 here would
+    # be a fabricated measurement.
+    if _REC is None or not isinstance(resp, dict):
+        return
+    pt, ct = resp.get("prompt_eval_count"), resp.get("eval_count")
+    if isinstance(pt, int):
+        _REC["prompt_tokens"] = pt
+    if isinstance(ct, int):
+        _REC["completion_tokens"] = ct
+
+
+def _log_flush(code):
+    global _LOGGED
+    if _REC is None or _LOGGED:
+        return
+    _LOGGED = True
+    try:
+        _REC["exit_code"] = code
+        os.makedirs(os.path.dirname(_USAGE_LOG), exist_ok=True)
+        with open(_USAGE_LOG, "a") as f:
+            f.write(json.dumps(_REC, separators=(",", ":")) + "\n")
+    except Exception:
+        pass
+
+
+def _exit_code(val):
+    if val is None:
+        return 0
+    if isinstance(val, int) and not isinstance(val, bool):
+        return val
+    return 1
+# ---------------------------------------------------------------------------
+
+
+def api(path, body=None, timeout=30):
+    req = urllib.request.Request(
+        f"{HOST}{path}",
+        data=json.dumps(body).encode() if body is not None else None,
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.load(r)
+
+
+def _exit(code, msg):
+    print(f"lo: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+
+def models_or_die():
+    try:
+        return [m["name"] for m in api("/api/tags").get("models", [])]
+    except urllib.error.URLError as e:
+        _exit(E_SERVER, f"ollama not reachable at {HOST} ({e.reason}). "
+                        f"Start it: ollama serve")
+
+
+def est_tokens(chars):
+    """Deliberately pessimistic — code and JSON run denser than 4 chars/token."""
+    return int(chars / 3.2) + 64
+
+
+def read_stdin(mode):
+    """Read piped input, without eating a loop's driving file.
+
+    `cat f | lo ...` arrives on a FIFO and is meant for us. But inside
+    `while read line; do lo ...; done < inputs.txt` stdin is a regular file —
+    the loop's own input — and draining it makes iterations 2..N vanish with a
+    clean exit 0. So auto-read pipes only, and make a redirected file opt-in.
+    """
+    if mode == "never" or sys.stdin.isatty():
+        return ""
+    if mode != "always":
+        try:
+            if not stat.S_ISFIFO(os.fstat(sys.stdin.fileno()).st_mode):
+                print("lo: stdin is a redirected file, not a pipe — not reading it, "
+                      "since that would consume a surrounding loop's input. "
+                      "Pass -i to read it, or pipe it with cat.", file=sys.stderr)
+                return ""
+        except OSError:
+            return ""
+    try:
+        return sys.stdin.buffer.read().decode("utf-8", "replace").strip()
+    except OSError as e:
+        _exit(1, f"could not read stdin: {e}")
+
+
+def timeout_help(seconds):
+    return (f"no response in {seconds}s. The model may still be loading into RAM, "
+            f"or another process is holding the GPU (check: ollama ps). Retry, "
+            f"raise --timeout, or use -m fast.")
+
+
+def supports_thinking(model):
+    try:
+        return "thinking" in api("/api/show", {"model": model}).get("capabilities", [])
+    except Exception:
+        return False
+
+
+def cmd_list(explicit_model=None):
+    have = models_or_die()
+    print("installed:")
+    for m in have:
+        print(f"  {m}")
+    print("aliases:")
+    for a, m in sorted(ALIASES.items()):
+        print(f"  {a:5s} -> {m}{'' if m in have else '   [NOT INSTALLED]'}")
+    return 0
+
+
+def cmd_check(model):
+    have = models_or_die()
+    print(f"server   OK  {HOST}")
+    if model in have:
+        think = "thinking" if supports_thinking(model) else "no-thinking"
+        print(f"model    OK  {model} ({think})")
+    else:
+        _exit(E_MODEL, f"model {model} not installed. Pull it: ollama pull {model}")
+    missing = [f"{a}->{m}" for a, m in ALIASES.items() if m not in have]
+    if missing:
+        print("missing  " + ", ".join(sorted(set(missing))))
+    return 0
+
+
+def main():
+    p = argparse.ArgumentParser(
+        prog="lo", description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("prompt", nargs="*", help="user prompt")
+    p.add_argument("-m", "--model", default="q",
+                   help="alias (q|qwen|fast|g|gemma) or full ollama tag")
+    p.add_argument("-s", "--system", help="system prompt")
+    p.add_argument("-t", "--max-tokens", type=int, default=4096)
+    p.add_argument("-j", "--json", action="store_true",
+                   help="force a JSON object response")
+    p.add_argument("--temp", type=float, default=0.2)
+    p.add_argument("--ctx", type=int, default=16384,
+                   help="num_ctx; KV cache grows with this, keep it tight")
+    p.add_argument("--think", action="store_true",
+                   help="let the model reason before answering (slower)")
+    p.add_argument("--timeout", type=int, default=300,
+                   help="seconds before the call is abandoned")
+    p.add_argument("--max-input", type=int, default=DEFAULT_MAX_INPUT,
+                   help="character budget for the whole prompt")
+    p.add_argument("--force", action="store_true",
+                   help="send even if over the input budget (also grows --ctx to fit)")
+    p.add_argument("--grow-ctx", action="store_true",
+                   help="raise --ctx to fit the input instead of refusing")
+    p.add_argument("-i", "--stdin", nargs="?", const="always", default="auto",
+                   choices=["auto", "always", "never"],
+                   help="auto reads pipes only; -i also reads a redirected file")
+    p.add_argument("--keep-alive", default="15m",
+                   help="how long ollama holds the model in RAM")
+    p.add_argument("--stats", action="store_true",
+                   help="print tok/s and token counts to stderr")
+    p.add_argument("--retry", action="store_true",
+                   help="retry once on empty output")
+    p.add_argument("--list", action="store_true", help="list models and aliases")
+    p.add_argument("--check", action="store_true", help="preflight check")
+    args = p.parse_args()
+
+    model = ALIASES.get(args.model, args.model)
+
+    if args.list:
+        sys.exit(cmd_list())
+    if args.check:
+        sys.exit(cmd_check(model))
+    if not args.prompt:
+        p.error("a prompt is required (or use --check / --list)")
+
+    _log_arm(model)
+
+    prompt = " ".join(args.prompt)
+    stdin_data = read_stdin(args.stdin)
+    if stdin_data:
+        prompt = f"{prompt}\n\n<input>\n{stdin_data}\n</input>"
+
+    size = len(prompt) + len(args.system or "")
+    if size > args.max_input and not args.force:
+        _exit(E_INPUT,
+              f"input is {size} chars, budget is {args.max_input}. A local model "
+              f"loses accuracy well before it loses context. Split the input into "
+              f"per-file or per-chunk calls, cut it down, or pass --force.")
+
+    # Ollama silently drops the FRONT of an oversized prompt — the instruction
+    # goes first and the answer comes back fluent and wrong. Size the window to
+    # the input rather than let that happen.
+    need = est_tokens(size)
+    if need > args.ctx:
+        if args.force or args.grow_ctx:
+            grown = min(MAX_CTX, int(need * 1.25) + 512)
+            if grown < need:
+                _exit(E_INPUT,
+                      f"input needs ~{need} tokens, more than the {MAX_CTX} ctx ceiling. "
+                      f"Split it — no flag makes this fit.")
+            print(f"lo: raising --ctx {args.ctx} -> {grown} to fit ~{need} tokens",
+                  file=sys.stderr)
+            args.ctx = grown
+        else:
+            _exit(E_INPUT,
+                  f"input is ~{need} tokens but --ctx is {args.ctx}; ollama would "
+                  f"silently discard the front of the prompt, including your "
+                  f"instruction. Raise --ctx, pass --grow-ctx, or split the input.")
+
+    have = models_or_die()
+    if model not in have:
+        # `gemma4` is ollama's own shorthand for `gemma4:latest` — resolve it
+        # rather than telling the caller to re-pull a model they already have.
+        if ":" not in model and f"{model}:latest" in have:
+            model = f"{model}:latest"
+            _log_model(model)  # log the id actually sent, not the shorthand
+        else:
+            _exit(E_MODEL, f"model {model} not installed. Pull it: ollama pull {model}"
+                           f"\n     installed: {', '.join(have) or '(none)'}")
+
+    messages = []
+    if args.system:
+        messages.append({"role": "system", "content": args.system})
+    messages.append({"role": "user", "content": prompt})
+
+    body = {
+        "model": model,
+        "messages": messages,
+        "stream": False,
+        "keep_alive": args.keep_alive,
+        "options": {
+            "temperature": args.temp,
+            "num_predict": args.max_tokens,
+            "num_ctx": args.ctx,
+        },
+    }
+    if args.json:
+        body["format"] = "json"
+    if supports_thinking(model):
+        body["think"] = args.think
+
+    def timed_chat():
+        t0 = time.monotonic()
+        try:
+            return api("/api/chat", body, timeout=args.timeout)
+        finally:
+            # runs on the error paths too, before the exception propagates
+            _log_latency(t0)
+
+    def call():
+        try:
+            return timed_chat()
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode()[:400]
+            if "think" in detail and "think" in body:
+                del body["think"]
+                return timed_chat()
+            _exit(1, f"HTTP {e.code}: {detail}")
+        except TimeoutError:
+            # Python 3.14 raises a bare TimeoutError on socket timeout, and it is
+            # NOT a URLError subclass — this must stay ahead of the URLError arm.
+            _exit(E_TIMEOUT, timeout_help(args.timeout))
+        except urllib.error.URLError as e:
+            reason = str(getattr(e, "reason", e))
+            if isinstance(e.reason, TimeoutError) or "timed out" in reason:
+                _exit(E_TIMEOUT, timeout_help(args.timeout))
+            _exit(E_SERVER, f"connection error: {reason}")
+
+    def answer(r):
+        # Ollama returns reasoning in its own `thinking` field. Only strip a
+        # </think> tag when the content actually opens with <think> — otherwise
+        # any answer that merely quotes the tag loses everything before it.
+        t = (r.get("message", {}).get("content") or "").strip()
+        if t.startswith("<think>") and "</think>" in t:
+            t = t.split("</think>", 1)[1].strip()
+        return t
+
+    resp = call()
+    _log_usage(resp)
+    text = answer(resp)
+
+    if not text and args.retry:
+        resp = call()
+        _log_usage(resp)
+        text = answer(resp)
+
+    if args.stats:
+        ec, ed = resp.get("eval_count", 0), resp.get("eval_duration", 0)
+        pc = resp.get("prompt_eval_count", 0)
+        rate = f"{ec / (ed / 1e9):.1f}" if ec and ed else "?"
+        print(f"lo: {model} | in {pc} tok | out {ec} tok | {rate} tok/s",
+              file=sys.stderr)
+
+    if not text:
+        _exit(E_EMPTY, "model returned no text. Retry with --retry, drop --json, "
+                       "or raise -t if the answer was cut off mid-thought.")
+
+    # The server evaluating fewer prompt tokens than we sent means it dropped
+    # the front of the prompt — the answer is about text the model never saw.
+    sent, seen = est_tokens(size), resp.get("prompt_eval_count", 0)
+    if seen and seen >= args.ctx * 0.98 and sent > seen:
+        print(f"lo: WARNING — ollama evaluated {seen} prompt tokens against a "
+              f"--ctx of {args.ctx}; the front of your input was discarded.",
+              file=sys.stderr)
+
+    # A generation that stopped on the token cap is a fragment. In prose the
+    # caller can see that; inside -j it is invalid JSON with a green exit.
+    if resp.get("done_reason") == "length":
+        if args.json:
+            print(text)
+            _exit(E_TRUNC, f"JSON was cut off at the -t {args.max_tokens} token cap "
+                           f"— the output above is an incomplete fragment. Raise -t.")
+        print(f"lo: WARNING — output stopped at the -t {args.max_tokens} token cap; "
+              f"this answer is a fragment.", file=sys.stderr)
+
+    print(text)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit as e:
+        _log_flush(_exit_code(e.code))
+        raise
+    except KeyboardInterrupt:
+        _log_flush(130)
+        raise
+    except Exception:
+        _log_flush(1)
+        raise
+    else:
+        _log_flush(0)

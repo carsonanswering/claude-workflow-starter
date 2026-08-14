@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Eng-1",
+    "role": "engineer",
+    "job_description": "Build and ship ToyCo's web presence. Scope: this repo only. Quality bar: tests pass, page renders. Escalate anything touching prod or data.",
+    "tools": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Grep",
+      "Glob"
+    ],
+    "approval_gates": [
+      "deploy_prod",
+      "delete_data"
+    ],
+    "status": "active",
+    "max_concurrent_tasks": 1,
+    "id": "01KXWSD5HVNVP2HVQGSKH5FWZ6"
+  },
+  {
+    "name": "Mktr-1",
+    "role": "marketer",
+    "job_description": "Write ToyCo's copy and outreach. Draft freely; NOTHING leaves the building without owner sign-off. Escalate pricing or claims you can't source.",
+    "tools": [
+      "Read",
+      "Write",
+      "WebSearch",
+      "WebFetch"
+    ],
+    "approval_gates": [
+      "send_external",
+      "spend_money"
+    ],
+    "status": "active",
+    "max_concurrent_tasks": 1,
+    "id": "01KXWSD5HVNVP2HVQGSKH5FWZ7"
+  }
+]

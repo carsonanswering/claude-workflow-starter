@@ -1,0 +1,44 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/auto-session-title.sh",
+            "timeout": 15,
+            "statusMessage": "Naming session"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/usage-dashboard.sh",
+            "timeout": 30,
+            "statusMessage": "Regenerating Max savings dashboard"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/session-obsidian-log.py",
+            "timeout": 30,
+            "statusMessage": "Judging session for Obsidian log"
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/session-self-improve.py",
+            "timeout": 30,
+            "statusMessage": "Extracting self-improvement lessons"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/hooks/caveman-statusline.sh"
+  }
+}

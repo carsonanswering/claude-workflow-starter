@@ -1,0 +1,25 @@
+--- index.ts.orig-preharden	2026-08-02 18:55:59
++++ index.ts	2026-08-02 18:56:08
+@@ -499,6 +499,22 @@
+ 						},
+ 					],
+ 					details: makeDetails("single")([]),
++				};
++			}
++
++			// Headless runs (ctx.hasUI === false, e.g. `pi -p`) have no UI to show the
++			// project-agent confirmation dialog below, so an escalated scope must not
++			// silently skip that gate - refuse instead of running unconfirmed repo-controlled
++			// agents. This does not touch interactive behavior; the dialog path is unchanged.
++			if ((agentScope === "project" || agentScope === "both") && !ctx.hasUI) {
++				return {
++					content: [
++						{
++							type: "text",
++							text: `Refused: agentScope "${agentScope}" would run project-local agents from ${discovery.projectAgentsDir ?? `${CONFIG_DIR_NAME}/agents`} without confirmation, and no UI is available in this headless run to ask. Omit agentScope (defaults to "user") or run interactively.`,
++						},
++					],
++					details: makeDetails(hasChain ? "chain" : hasTasks ? "parallel" : "single")([]),
+ 				};
+ 			}
+ 

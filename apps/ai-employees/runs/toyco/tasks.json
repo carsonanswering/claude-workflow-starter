@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Build the ToyCo waitlist landing page",
+    "description": "Create a single static landing page for the ToyCo waitlist: headline, one-paragraph pitch, email signup form (no backend \u2014 form posts nowhere yet). Acceptance: page renders, copy is plainspoken, zero spend.",
+    "assignee_role": "engineer",
+    "source": "owner",
+    "parent_id": null,
+    "assignee_id": "01KXWSD5HVNVP2HVQGSKH5FWZ6",
+    "state": "done",
+    "priority": 1,
+    "gate_tags": [],
+    "result": "Eng-1 completed 'Build the ToyCo waitlist landing page'",
+    "id": "01KXWSD5HXF89T1K4YNQ5GJYRA",
+    "created_at": "2026-07-19T08:55:39.837452+00:00",
+    "updated_at": "2026-07-19T08:55:39.838804+00:00"
+  },
+  {
+    "title": "Draft the ToyCo announcement email to the beta list",
+    "description": "Write the announcement email for the beta list: subject line + body, plainspoken tone, no hype, no unsourced claims. Sending is gated \u2014 produce the draft for owner approval before anything leaves the building.",
+    "assignee_role": "marketer",
+    "source": "owner",
+    "parent_id": null,
+    "assignee_id": "01KXWSD5HVNVP2HVQGSKH5FWZ7",
+    "state": "done",
+    "priority": 2,
+    "gate_tags": [
+      "send_external"
+    ],
+    "result": "Mktr-1 completed 'Draft the ToyCo announcement email to the beta list'",
+    "id": "01KXWSD5HXF89T1K4YNQ5GJYRB",
+    "created_at": "2026-07-19T08:55:39.837707+00:00",
+    "updated_at": "2026-07-19T08:56:02.559790+00:00"
+  }
+]

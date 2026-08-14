@@ -1,0 +1,12 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "answering-suite",
+  "description": "Answering.com workflow suite: 32 skills incl. the Retell voice/chat agent composer, the workflow-starter orchestrator, orchestration doctrine (team-orchestration, loop-doctrine, frontier-orchestrator), daily-ops skills, and 8 specialist subagents for agent-team workflows.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Carson",
+    "email": "carson@answering.com"
+  },
+  "license": "Proprietary",
+  "keywords": ["retell", "voice-agents", "orchestration", "agent-teams", "workflows"]
+}

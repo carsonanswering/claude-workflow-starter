@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# pi-spawn: run a headless pi task in a detached tmux session.
+#
+#   pi-spawn [-m MODEL] [-d DIR] [-n NAME] "task prompt"
+#   pi-spawn -l          list running pi-* tmux sessions
+#   pi-spawn -k NAME     kill session pi-NAME (only pi-* sessions)
+set -euo pipefail
+
+LOG_DIR="${HOME}/.pi/agent/logs"
+DEFAULT_MODEL="${PI_SPAWN_MODEL:-fireworks/gpt-oss-120b}"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  pi-spawn [-m MODEL] [-d DIR] [-n NAME] "task prompt"
+  pi-spawn -l          list running pi-* tmux sessions
+  pi-spawn -k NAME     kill session pi-NAME (only pi-* sessions)
+
+Options:
+  -m MODEL   model to run (default: $PI_SPAWN_MODEL or fireworks/gpt-oss-120b)
+  -d DIR     working directory for the session (default: cwd)
+  -n NAME    session name suffix (session becomes pi-NAME)
+  -l         list running pi-* tmux sessions
+  -k NAME    kill tmux session pi-NAME
+EOF
+}
+
+slugify() {
+  # lowercase, replace non-alnum runs with '-', trim leading/trailing '-', cap length
+  printf '%s' "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' \
+    | cut -c1-40
+}
+
+MODEL=""
+DIR=""
+NAME=""
+MODE="run"
+KILL_NAME=""
+
+while getopts ":m:d:n:k:lh" opt; do
+  case "$opt" in
+    m) MODEL="$OPTARG" ;;
+    d) DIR="$OPTARG" ;;
+    n) NAME="$OPTARG" ;;
+    l) MODE="list" ;;
+    k) MODE="kill"; KILL_NAME="$OPTARG" ;;
+    h) usage; exit 0 ;;
+    \?) echo "pi-spawn: unknown option -$OPTARG" >&2; usage >&2; exit 2 ;;
+    :) echo "pi-spawn: option -$OPTARG requires an argument" >&2; usage >&2; exit 2 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [[ "$MODE" == "list" ]]; then
+  sessions="$(tmux ls 2>/dev/null | awk -F: '{print $1}' | grep -E '^pi-' || true)"
+  if [[ -z "$sessions" ]]; then
+    echo "No running pi-* sessions."
+  else
+    echo "Running pi-* sessions:"
+    echo "$sessions" | sed 's/^/  /'
+  fi
+  exit 0
+fi
+
+if [[ "$MODE" == "kill" ]]; then
+  if [[ -z "$KILL_NAME" ]]; then
+    echo "pi-spawn: -k requires a NAME" >&2
+    exit 2
+  fi
+  sess="pi-${KILL_NAME}"
+  if [[ "$sess" != pi-* ]]; then
+    echo "pi-spawn: refusing to touch non pi-* session '$sess'" >&2
+    exit 2
+  fi
+  if ! tmux has-session -t "$sess" 2>/dev/null; then
+    echo "pi-spawn: no such session '$sess'" >&2
+    exit 1
+  fi
+  tmux kill-session -t "$sess"
+  echo "Killed session $sess"
+  exit 0
+fi
+
+# --- run mode ---
+if [[ $# -lt 1 || -z "${1:-}" ]]; then
+  echo "pi-spawn: missing task prompt" >&2
+  usage >&2
+  exit 2
+fi
+TASK="$1"
+
+MODEL="${MODEL:-$DEFAULT_MODEL}"
+
+if [[ -n "$DIR" ]]; then
+  if [[ ! -d "$DIR" ]]; then
+    echo "pi-spawn: directory does not exist: $DIR" >&2
+    exit 1
+  fi
+else
+  DIR="$(pwd)"
+fi
+
+if [[ -z "$NAME" ]]; then
+  slug="$(slugify "$TASK")"
+  [[ -z "$slug" ]] && slug="task"
+  NAME="${slug}-$$"
+fi
+
+# Validate NAME (whether auto-generated or given via -n) before it is used to
+# build a tmux session name and a log file path. Auto-generated names are
+# already safe (slugify() strips to [a-z0-9-]), but an explicit -n bypassed
+# that entirely: a NAME containing "/" silently loses the log (mkdir -p only
+# creates LOG_DIR, not sub-paths), and a NAME containing ".." creates a tmux
+# session that neither `tmux send-keys` nor `tmux kill-session`/`pi-spawn -k`
+# can subsequently address (tmux's target parser treats ".." specially),
+# leaving a permanently orphaned session recoverable only via raw session ID.
+if [[ "$NAME" != *[!a-zA-Z0-9._-]* ]]; then
+  :
+else
+  echo "pi-spawn: invalid -n NAME '$NAME' (only [A-Za-z0-9._-] allowed)" >&2
+  exit 2
+fi
+if [[ "$NAME" == *".."* || "$NAME" == "." || -z "$NAME" ]]; then
+  echo "pi-spawn: invalid -n NAME '$NAME' ('.' and '..' not allowed)" >&2
+  exit 2
+fi
+
+SESSION="pi-${NAME}"
+
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+  echo "pi-spawn: session '$SESSION' already exists, refusing to clobber it" >&2
+  echo "  inspect with: tmux attach -t $SESSION" >&2
+  echo "  or kill with: pi-spawn -k $NAME" >&2
+  exit 1
+fi
+
+mkdir -p "$LOG_DIR"
+LOG_PATH="${LOG_DIR}/${NAME}.log"
+
+# Pass the task text (and other values) via env vars set at session-creation
+# time with `new-session -e`, rather than interpolating them into the tmux
+# command string, so quotes/newlines in a prompt cannot break or inject into
+# the shell command. NOTE: `tmux set-environment` after the session already
+# exists does NOT propagate to the pane's already-running shell (verified) -
+# `-e` on `new-session` is the form that actually reaches the spawned shell.
+tmux new-session -d -s "$SESSION" -c "$DIR" \
+  -e "PI_SPAWN_TASK=${TASK}" \
+  -e "PI_SPAWN_MODEL_RUN=${MODEL}" \
+  -e "PI_SPAWN_NAME_RUN=${NAME}" \
+  -e "PI_SPAWN_LOG=${LOG_PATH}"
+
+# Run under an explicit /bin/bash -c (never whatever $SHELL/tmux default-shell
+# happens to be) so that ${PIPESTATUS[0]} is guaranteed to exist. PIPESTATUS
+# must be captured in the statement immediately after the pipeline - even an
+# intervening `echo` clobbers it - so we grab it into $ec before doing
+# anything else. The real exit code is then appended to the log itself
+# (`[pi-spawn] exit=<N>`) so the log is self-describing for a script to parse,
+# in addition to the human-readable message left in the pane.
+tmux send-keys -t "$SESSION" \
+  'exec /bin/bash -c '\''pi -p --model "$PI_SPAWN_MODEL_RUN" -n "$PI_SPAWN_NAME_RUN" "$PI_SPAWN_TASK" 2>&1 | tee "$PI_SPAWN_LOG"; ec=${PIPESTATUS[0]}; echo "[pi-spawn] exit=$ec" >> "$PI_SPAWN_LOG"; echo "[pi-spawn] task exited $ec, pane stays open"; exec "${SHELL:-/bin/bash}"'\''' \
+  Enter
+
+echo "session:  $SESSION"
+echo "model:    $MODEL"
+echo "dir:      $DIR"
+echo "log:      $LOG_PATH"
+echo "attach:   tmux attach -t $SESSION"
