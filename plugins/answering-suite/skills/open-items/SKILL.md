@@ -1,6 +1,6 @@
 ---
 name: open-items
-description: Regenerates the phone-viewable Open Items artifact from the locally curated items.json — actions waiting on Taj, ready-to-pick-up work, ideas, blocked items (GitHub tracker labels live in tracker-refresh).
+description: Regenerates the phone-viewable Open Items artifact from the locally curated items.json — actions waiting on Carson, ready-to-pick-up work, ideas, blocked items (GitHub tracker labels live in tracker-refresh).
 disable-model-invocation: true
 ---
 
@@ -19,7 +19,7 @@ localStorage — refresh regenerates list, prunes done ids no longer present.
    Schema — this block is the source of truth; `refresh.py` fills `updatedAt`:
    `{"items": [{"id": "kebab-slug", "title", "section": "you|ready|idea|blocked",
    "repo", "note", "effort": "S|M|L", "blocker", "prompt": "<pickup prompt path>"}]}`
-   Sections: `you` = needs Taj personally (pushes, tokens, decisions);
+   Sections: `you` = needs Carson personally (pushes, tokens, decisions);
    `ready` = unblocked work an agent can start; `idea` = candidate projects;
    `blocked` = waiting on external.
 2. `python3 ~/.claude/skills/open-items/refresh.py` — prints summary + url.
@@ -32,10 +32,10 @@ localStorage — refresh regenerates list, prunes done ids no longer present.
 
 Spawn ONE `caveman:cavecrew-investigator` (haiku) to sweep git repos under
 ~/projs (unmerged branches, dirty trees, ahead-of-remote) + memory index
-`/Users/taj/.claude/projects/-Users-taj-projs/memory/MEMORY.md`; diff its
+`/home/schmi/.claude/projects/-home-schmi-projs/memory/MEMORY.md`; diff its
 findings against items.json, apply updates, then Refresh flow. The sweep is done
 when every repo carrying an unmerged branch, a dirty tree, or unpushed commits is
 either represented by an item or explicitly judged not worth one — say which in
 the reply. Keep the sweep inside that agent so the frontier session pays only for
 the diff. New pickup prompts go through the `prompt-engineer` agent into
-`/Users/taj/projs/prompts/open-tasks/` (CLAUDE.md rule).
+`/home/schmi/projs/prompts/open-tasks/` (CLAUDE.md rule).

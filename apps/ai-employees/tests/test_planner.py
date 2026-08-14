@@ -20,7 +20,7 @@ from ai_employees.planner import (
 def make_company() -> Company:
     return Company(
         name="toyco",
-        owner="taj@example.com",
+        owner="carson@example.com",
         goals=["Launch a landing page", "Send an announcement email"],
         constraints=["Spend $0"],
     )

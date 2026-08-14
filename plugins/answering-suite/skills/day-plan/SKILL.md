@@ -5,7 +5,7 @@ description: Day plan — today's meetings, what slipped since yesterday, the to
 
 # day-plan
 
-Answers one question every morning: **what are Taj and Carson actually working
+Answers one question every morning: **what are Carson and Carson actually working
 on today, and what changed since yesterday's answer.**
 
 Repo: the repo root (current checkout). Read `core/DOCTRINE.md` first.
@@ -25,11 +25,11 @@ In parallel:
   item goes).
 - **Gmail** — `mcp__claude_ai_Gmail__search_threads` for `is:unread newer_than:2d`
   and for `newer_than:7d in:inbox -from:me`. Keep a thread only when someone is
-  blocked on Taj, tested this way: the newest message in the thread is from
-  someone else, it asks Taj for a decision, review, file, or approval, and Taj
+  blocked on Carson, tested this way: the newest message in the thread is from
+  someone else, it asks Carson for a decision, review, file, or approval, and Carson
   has not replied since. Everything else is general unread — leave it out.
 - **Open items** — read `~/.claude/skills/open-items/items.json`; it is the task
-  tracker. Where that path is absent — a checkout without Taj's home directory —
+  tracker. Where that path is absent — a checkout without Carson's home directory —
   read `state/open-items-snapshot.json` instead, date it with
   `git log -1 --format=%cs -- state/open-items-snapshot.json`, and say in the
   post that open items are as of that date. Sections map straight through in
@@ -50,7 +50,7 @@ In parallel:
   done
   ```
 
-  *Bare checkout — no `~/projs`.* Taj's other repos are not cloned here, so
+  *Bare checkout — no `~/projs`.* Carson's other repos are not cloned here, so
   cover this repo alone and carry the gap into step 4 as a skipped lane rather
   than guessing at the rest:
 
@@ -134,7 +134,7 @@ header follows §5, and the delta from step 2 feeds the *Slipped* and *Waiting o
 others* lines rather than being pasted in as a raw delta body.
 
 When step 1 took the bare-checkout branch, close the post with
-`_repo lane: <repo> only — Taj's other repos are not cloned on this host_`, so a
+`_repo lane: <repo> only — Carson's other repos are not cloned on this host_`, so a
 short plan reads as thin coverage rather than a quiet day.
 
 If nothing slipped and the top 3 are unchanged from yesterday, say so in one

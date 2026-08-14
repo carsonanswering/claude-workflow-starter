@@ -1,16 +1,16 @@
 ---
 name: deploydemo
-description: Stand up the Cortex demo appliance and reconcile docs/handoff/DEMO-PILOT.md against what the box actually does. Use when Taj says "/deploydemo", "deploy the demo", "spin up the demo", "get the demo ready", "is the demo still working", or before a pilot call. Accepts an optional argument, e.g. "/deploydemo preflight" (blockers only, change nothing) or "/deploydemo --fresh" (destroy the demo workspace corpus and reseed) or "/deploydemo --teardown" (remove the workspace).
+description: Stand up the Answering demo appliance and reconcile docs/handoff/DEMO-PILOT.md against what the box actually does. Use when Carson says "/deploydemo", "deploy the demo", "spin up the demo", "get the demo ready", "is the demo still working", or before a pilot call. Accepts an optional argument, e.g. "/deploydemo preflight" (blockers only, change nothing) or "/deploydemo --fresh" (destroy the demo workspace corpus and reseed) or "/deploydemo --teardown" (remove the workspace).
 argument-hint: "(optional) preflight | --fresh | --teardown"
 ---
 
 # deploydemo
 
-Get the Cortex demo appliance running, prove every beat in the guide still
+Get the Answering demo appliance running, prove every beat in the guide still
 works, patch the guide where reality has moved, and hand back the short list of
 things only a human can do.
 
-Repo: `~/projs/cortex`. Guide: `docs/handoff/DEMO-PILOT.md`. Everything you run
+Repo: `~/projs/answering`. Guide: `docs/handoff/DEMO-PILOT.md`. Everything you run
 lives under `deploy/appliance/`.
 
 ## The one rule
@@ -28,7 +28,7 @@ it.
 ## Run it
 
 ```bash
-cd ~/projs/cortex/deploy/appliance
+cd ~/projs/answering/deploy/appliance
 ./demo/verify.sh              # preflight, build, seed, run all six beats
 ./demo/verify.sh --preflight  # blockers only, changes nothing
 ./demo/verify.sh --fresh      # destroy this workspace's corpus, then rebuild
@@ -36,15 +36,15 @@ cd ~/projs/cortex/deploy/appliance
 ```
 
 **The demo builds its own throwaway workspace.** It runs as the compose project
-`cortex-demo` with its own network, its own `cortex-demo_pgdata` volume, and its
+`answering-demo` with its own network, its own `answering-demo_pgdata` volume, and its
 own corpus under `demo/workspace/drop` — all created on demand, all git-ignored.
 Nothing you do here can reach a pilot deployment or another project on the same
 machine, and `--teardown` removes only this one.
 
 That isolation is the reason `--fresh` and `--teardown` are safe to offer at
-all. Before it existed the demo shared the `cortex` project and volume with any
+all. Before it existed the demo shared the `answering` project and volume with any
 real deployment from the same compose file, so a demo reset would have destroyed
-a pilot's corpus. Override the name with `CORTEX_DEMO_PROJECT` if you ever need
+a pilot's corpus. Override the name with `ANSWERING_DEMO_PROJECT` if you ever need
 two demo boxes side by side.
 
 `verify.sh` is the source of truth, not this file. It prints each beat between
@@ -58,7 +58,7 @@ Argument handling:
 - `preflight` — run with `--preflight`, report blockers, stop. Change nothing,
   edit nothing.
 - `--fresh` — destroys the demo workspace's corpus first, then rebuilds. Scoped
-  to `cortex-demo`, so it cannot touch anything else — but still only when
+  to `answering-demo`, so it cannot touch anything else — but still only when
   asked. Never destroy on a bare invocation.
 - `--teardown` — remove the workspace and stop. Use after a demo, or when the
   box is being handed to someone else.

@@ -9,13 +9,13 @@ One ritual, run the same way every time, for a recurring job on **this machine**
 
 Scope: launchd is for work that needs this Mac — local git repos, local MCP auth, files on this disk. A routine that only touches the web belongs in the cloud `schedule` skill, which keeps firing with the laptop shut.
 
-`cortex-brief`'s per-tool local-vs-cloud split lives in `/Users/taj/projs/cortex-brief/SCHEDULING.md`; its install snippet predates this skill, so where the two differ the ritual below wins.
+`answering-brief`'s per-tool local-vs-cloud split lives in `/home/schmi/projs/answering-brief/SCHEDULING.md`; its install snippet predates this skill, so where the two differ the ritual below wins.
 
 ## The ritual
 
 ### 1. Name it
 
-Label is reverse-DNS: `com.taj.<job>`, or `com.cortexrnd.<job>` for shared CortexRND tooling. The file goes at `~/Library/LaunchAgents/<label>.plist`.
+Label is reverse-DNS: `com.carson.<job>`, or `com.answeringrnd.<job>` for shared AnsweringRND tooling. The file goes at `~/Library/LaunchAgents/<label>.plist`.
 
 Done when the filename stem and the `<Label>` string are character-identical. launchd addresses a service by Label, so a mismatch loads a job that `launchctl print` on the name you expect answers `Could not find service`.
 
@@ -67,9 +67,9 @@ Done when the log holds output from the run you just fired — check the timesta
 - **`Bootstrap failed: 5: Input/output error`** — the label is already loaded. Bootout, then bootstrap again (step 3). If a clean bootout still gives 5, launchd is rejecting the file: `plutil -lint` it, then confirm every absolute path inside it exists.
 - **Registered but never fires** — launchd skips a `StartCalendarInterval` that comes due while the Mac is asleep and fires it once on wake, so a laptop closed over a weekend yields one catch-up run, not three. Coverage that must not slip belongs in the cloud `schedule` skill.
 - **Fires, then dies with auth or "command not found" errors** — launchd hands the process a minimal environment. `/bin/zsh -lc` is what sources `~/.zshenv`, where the API keys live; a bare binary path or `-c` without `-l` gets none of them. Non-shell jobs carry an explicit `EnvironmentVariables` `PATH` instead.
-- **First run hangs on a permission prompt** — a job touching Calendar, Contacts, or protected disk areas triggers a macOS consent dialog on its first launch. Kickstart it while Taj is at the machine so the prompt lands in front of him rather than at 06:06.
+- **First run hangs on a permission prompt** — a job touching Calendar, Contacts, or protected disk areas triggers a macOS consent dialog on its first launch. Kickstart it while Carson is at the machine so the prompt lands in front of him rather than at 06:06.
 
-## Ask Taj first
+## Ask Carson first
 
-- Before removing or overwriting any existing plist in `~/Library/LaunchAgents/` — `com.taj.cortex-dayplan`, `com.taj.cortex-dailybrief`, `com.taj.cortex-compwatch`, and `com.cortexrnd.tracker-refresh` are live jobs.
+- Before removing or overwriting any existing plist in `~/Library/LaunchAgents/` — `com.carson.answering-dayplan`, `com.carson.answering-dailybrief`, `com.carson.answering-compwatch`, and `com.answeringrnd.tracker-refresh` are live jobs.
 - Before the first fire of a job that posts outward (Slack, email, a remote push) — confirm the destination, since kickstart sends it for real.

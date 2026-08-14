@@ -6,7 +6,7 @@ Shared Claude Code skills, agents, hooks, and statusline for the team. See [READ
 
 ### Issue tracker
 
-Issues live as GitHub Issues on `CortexRND/skills`, driven via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+Issues live as GitHub Issues on `AnsweringRND/skills`, driven via the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 

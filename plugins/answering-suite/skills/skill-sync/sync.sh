@@ -1,9 +1,9 @@
 #!/bin/bash
-# skill-sync — mirror skills / agents / hooks into the CortexRND/skills share repo and push.
+# skill-sync — mirror skills / agents / hooks into the AnsweringRND/skills share repo and push.
 #
 #   sync.sh <name>... [-m "commit message"]   sync named skills, agents or hooks
 #   sync.sh --all-changed [-m "message"]      sync every source item whose content differs
-#   sync.sh --check-trio                      diff the cortex-brief trio pairs only, no git
+#   sync.sh --check-trio                      diff the answering-brief trio pairs only, no git
 #
 # Exit: 0 ok · 1 trio drift (--check-trio) · 2 refused · 3 trio drift blocks sync · 4 push failed
 #
@@ -12,18 +12,18 @@
 
 set -o pipefail
 
-REPO=/Users/taj/projs/skills
-REMOTE_URL=https://github.com/CortexRND/skills.git
+REPO=/home/schmi/projs/skills
+REMOTE_URL=https://github.com/AnsweringRND/skills.git
 BRANCH=main
 
-SKILL_ROOTS="/Users/taj/.claude/skills /Users/taj/projs/.claude/skills"
-AGENT_ROOTS="/Users/taj/.claude/agents /Users/taj/projs/.claude/agents"
-HOOK_ROOTS="/Users/taj/.claude/hooks /Users/taj/projs/.claude/hooks"
+SKILL_ROOTS="/home/schmi/.claude/skills /home/schmi/projs/.claude/skills"
+AGENT_ROOTS="/home/schmi/.claude/agents /home/schmi/projs/.claude/agents"
+HOOK_ROOTS="/home/schmi/.claude/hooks /home/schmi/projs/.claude/hooks"
 
 # day-plan, daily-brief and comp-watch exist at both of these and must stay byte-identical.
 TRIO_NAMES="day-plan daily-brief comp-watch"
-TRIO_USER=/Users/taj/.claude/skills
-TRIO_PROJ=/Users/taj/projs/cortex-brief/.claude/skills
+TRIO_USER=/home/schmi/.claude/skills
+TRIO_PROJ=/home/schmi/projs/answering-brief/.claude/skills
 
 RSYNC_EX=(--exclude='*state.json' --exclude='items.json' --exclude='out/' \
           --exclude='*.log' --exclude='__pycache__/' --exclude='*.pyc' \
@@ -38,11 +38,11 @@ die() { c=$1; shift; printf 'skill-sync: %s\n' "$*" >&2; exit "$c"; }
 
 usage() {
   cat <<'USAGE'
-skill-sync — mirror skills/agents/hooks into the CortexRND/skills share repo, then push.
+skill-sync — mirror skills/agents/hooks into the AnsweringRND/skills share repo, then push.
 
   sync.sh <name>... [-m "commit message"]   sync named skills, agents or hooks
   sync.sh --all-changed [-m "message"]      sync every source item whose content differs
-  sync.sh --check-trio                      diff the cortex-brief trio pairs only, no git
+  sync.sh --check-trio                      diff the answering-brief trio pairs only, no git
 
 Exit: 0 ok · 1 trio drift (--check-trio) · 2 refused · 3 trio drift blocks sync · 4 push failed
 USAGE
@@ -187,7 +187,7 @@ fi
 url=$(git -C "$REPO" remote get-url origin 2>/dev/null)
 [ "$url" = "$REMOTE_URL" ] || die 2 "origin is '$url', expected $REMOTE_URL — refusing to push"
 cur=$(git -C "$REPO" rev-parse --abbrev-ref HEAD 2>/dev/null)
-[ "$cur" = "$BRANCH" ] || die 2 "share repo is on branch '$cur', expected $BRANCH — ask Taj before syncing off $BRANCH"
+[ "$cur" = "$BRANCH" ] || die 2 "share repo is on branch '$cur', expected $BRANCH — ask Carson before syncing off $BRANCH"
 
 # --- build the plan ---------------------------------------------------------
 PLAN=''
@@ -249,7 +249,7 @@ while IFS='|' read -r t s d; do
 done <<EOF
 $PLAN
 EOF
-[ "$rc" -eq 0 ] || die 3 "trio drift blocks this sync — show Taj the diff above and ask which side is authoritative before either copy overwrites the other"
+[ "$rc" -eq 0 ] || die 3 "trio drift blocks this sync — show Carson the diff above and ask which side is authoritative before either copy overwrites the other"
 
 # --- copy -------------------------------------------------------------------
 count=0
@@ -296,7 +296,7 @@ if [ -n "$offend" ]; then
 fi
 
 git -C "$REPO" commit -q -m "$MSG" || die 2 "commit failed in $REPO"
-git -C "$REPO" push -q origin "$BRANCH" || die 4 "push rejected — origin has commits you do not; show Taj 'git -C $REPO log --oneline HEAD..origin/$BRANCH' and ask before rebasing or merging"
+git -C "$REPO" push -q origin "$BRANCH" || die 4 "push rejected — origin has commits you do not; show Carson 'git -C $REPO log --oneline HEAD..origin/$BRANCH' and ask before rebasing or merging"
 
 sha=$(git -C "$REPO" rev-parse --short HEAD)
 sb=$(git -C "$REPO" status -sb | head -1)

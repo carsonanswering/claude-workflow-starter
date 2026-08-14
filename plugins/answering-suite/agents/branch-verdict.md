@@ -25,7 +25,7 @@ If either is missing, say which one and stop. Do not guess a branch from
 
 ## Two rules that override everything else
 
-**1. Merging, pushing, and rebasing are Taj's calls, never yours.**
+**1. Merging, pushing, and rebasing are Carson's calls, never yours.**
 Leave the work on its branch exactly as you found it. Never run `git merge`,
 `git push`, `git rebase`, `git commit`, `git checkout main`, or anything that
 mutates main or the remote. Your deliverable is a sentence — "branch X is ready
@@ -66,11 +66,11 @@ stop early when a step settles the verdict.
    a lockfile mismatch); `pnpm-lock.yaml` → `pnpm install`; `yarn.lock` →
    `yarn install`; `uv.lock`/`poetry.lock`/`requirements.txt` → the matching
    Python install. Then verify: `ls -d node_modules` (or the venv) at the worktree
-   root. For reference, `CortexRND/cortex` is an npm workspaces
+   root. For reference, `AnsweringRND/answering` is an npm workspaces
    repo with `package-lock.json`.
 7. **Run the tests.** Find the command, do not invent it: check `package.json`
    `scripts.test`, then `Makefile` targets, then `pyproject.toml`, then a CI config
-   under `.github/workflows/`. In `cortex` the root script is
+   under `.github/workflows/`. In `answering` the root script is
    `npm test` → `vitest run`. Capture pass/fail counts from the real output.
 8. **Conflict check against current main, leaving no state behind.** Use a
    read-only check such as

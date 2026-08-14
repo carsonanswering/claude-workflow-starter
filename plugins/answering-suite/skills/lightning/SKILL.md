@@ -42,7 +42,7 @@ Before descending the LIVE candidate, write the cheapest probe that could *kill*
 |---|---|
 | Kill observation seen | Mark `✗ dead: <one-line reason>`. Control returns to the exact branch point the candidate forked from — not the task start, not the previous turn's file — because that fork still holds every candidate not yet ruled out. The next `queued` candidate there goes LIVE. Discard everything learned below the dead candidate except the one-line reason, because dead-path detail is context you will never act on. |
 | Viability confirmed | Mark `✓ validated` and go to DISCHARGE. If validation raises a new sub-question, push a child branch point under the validated path and continue there. |
-| Inconclusive | At most one sharper redesign of that probe; if still inconclusive, mark the candidate `unproven` — it counts as neither dead nor alive — and move to the next candidate, because a probe that cannot decide is measuring the wrong thing. Three inconclusive probes at one branch point means the branch question itself is wrong: restate the question yourself when you can name a sharper one the same evidence would answer, and escalate to Taj when you cannot name it. |
+| Inconclusive | At most one sharper redesign of that probe; if still inconclusive, mark the candidate `unproven` — it counts as neither dead nor alive — and move to the next candidate, because a probe that cannot decide is measuring the wrong thing. Three inconclusive probes at one branch point means the branch question itself is wrong: restate the question yourself when you can name a sharper one the same evidence would answer, and escalate to Carson when you cannot name it. |
 | New candidates discovered mid-probe | Insert them as `queued` at the branch point they actually belong to — often an ancestor, not the current frame — because a candidate filed at the wrong fork is invisible when that fork is revisited. |
 
 ## POP — exhaustion
@@ -61,7 +61,7 @@ On validation, stop probing and commit to the path completely: execute to comple
 - Frames: `B0`, `B1`, … for branch points; `P1`, `P2`, `P3a`, … for paths, indented under their branch point. A child branch point gets its own line, indented under the path that spawned it, carrying its branch question.
 - The `LIVE` line names the probe and its kill condition inline, so the next legal move is always visible without a separate footer.
 - The whole trace stays under ~12 lines — it is a map, not a log: prune nothing, but never narrate inside it. When it would run over, collapse each `EXHAUSTED` subtree into the single inherited verdict line on its parent path and keep every `queued`, `unproven`, `◀ LIVE`, and `✓ validated` candidate visible, because a popped frame is the one region you will never re-enter.
-- Re-emit rule: emit the trace at the first branch point, then re-emit the *whole current trace* on every branch event — new branch point, kill, pop, validation, discharge — never as a diff and never as a partial, because re-emitting whole is what stops the trace decaying over a long session, and that is the only reason Taj can see the bolt's shape and catch a wrong turn early.
+- Re-emit rule: emit the trace at the first branch point, then re-emit the *whole current trace* on every branch event — new branch point, kill, pop, validation, discharge — never as a diff and never as a partial, because re-emitting whole is what stops the trace decaying over a long session, and that is the only reason Carson can see the bolt's shape and catch a wrong turn early.
 - Worked traces for the kill, child-branch nesting, and pop cases: see [TRACES.md](TRACES.md) — open it before emitting your first trace of the session, and again the first time a frame nests or exhausts.
 
 ## Compliance triggers — signal → required next move
@@ -78,7 +78,7 @@ A subagent is one probe: hand it one narrow falsifiable question plus the kill c
 
 ## Exit
 
-The run ends at a completed discharge, or at an honest report that `B0` is `EXHAUSTED`, with the trace as evidence of what was ruled out. Root exhaustion means the framing was wrong, and you cannot fix your own framing by trying harder — present the tree with every kill reason, name the candidates still `unproven` and the instrument that would decide each, and ask Taj which assumption to reopen.
+The run ends at a completed discharge, or at an honest report that `B0` is `EXHAUSTED`, with the trace as evidence of what was ruled out. Root exhaustion means the framing was wrong, and you cannot fix your own framing by trying harder — present the tree with every kill reason, name the candidates still `unproven` and the instrument that would decide each, and ask Carson which assumption to reopen.
 
 ## Anti-patterns
 

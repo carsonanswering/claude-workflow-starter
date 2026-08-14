@@ -1,12 +1,12 @@
 ---
 name: comp-watch
-description: Competitive watch over the company-brain / org-memory watchlist — posts only what changed. Use when the user says "/comp-watch", "competitor update", "what did competitors ship", or "TAM update". Not for one-off research on a single company.
+description: Competitive watch over the AI-answering / voice-agent watchlist — posts only what changed. Use when the user says "/comp-watch", "competitor update", "what did competitors ship", or "TAM update". Not for one-off research on a single company.
 ---
 
 # comp-watch
 
-Daily competitor tracking for Cortex Brain. Reports the **delta** in the
-company-brain / org-memory / meeting-intelligence space since the last run.
+Daily competitor tracking for Answering. Reports the **delta** in the
+AI-answering / voice-agent / front-desk-automation space since the last run.
 
 Repo: the repo root (current checkout). Read `core/DOCTRINE.md` before doing
 anything — it defines the delta contract, id rules, citation rule, and Slack
@@ -93,7 +93,7 @@ days. Give it the id `new:<slug>` — the prefix keeps it distinct from the poll
 id it earns on promotion — plus `segment`, `tier`, `discovered_via` and `url`,
 and put it in the observation array, so state remembers it and the same startup
 is not rediscovered every morning. Leave `watchlist.json` alone — propose it in
-the post and let Taj promote it.
+the post and let Carson promote it.
 
 Done when every `new:` id in state is either re-emitted in this run's array or
 already promoted into `watchlist.json` under its polled id.
@@ -114,7 +114,7 @@ cd "$(git rev-parse --show-toplevel)" && python3 bin/check_urls.py
 It HEAD-then-GET probes every watch URL of every active entry and exits non-zero
 if any failed. A company still exists when at least one of its `watch_urls`
 returns 200. Give every `FAIL` line one of two verdicts before moving on: *URL
-moved* (find the live replacement and flag it for Taj) or *company gone* —
+moved* (find the live replacement and flag it for Carson) or *company gone* —
 confirm with WebSearch `<name> acquired OR "shut down" OR sunset`, and a
 confirmed exit leads the post.
 

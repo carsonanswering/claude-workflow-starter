@@ -29,7 +29,7 @@ docs/data-model.md. IDs are assigned at load (ULIDs); YAML uses local names.
 
 ```yaml
 name: toyco
-owner: taj.vasudeva@gmail.com          # approval requests go here
+owner: schmidtcarson016@gmail.com          # approval requests go here
 goals:                                  # ordered, highest priority first
   - Launch a landing page for the ToyCo waitlist
   - Draft and send one announcement email to the beta list
@@ -38,7 +38,7 @@ constraints:                            # injected into every employee prompt
   - No external communication without owner approval
   - Tone: plainspoken, no hype
 resources:
-  repo: github.com/taj/toyco-site
+  repo: github.com/carsonanswering/toyco-site
   domain: toyco.example.com
   email_api_key: TOYCO_RESEND_KEY       # env var name, not the secret
 

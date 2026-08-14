@@ -16,7 +16,7 @@
 #   tracker.sh status                 who holds what right now
 
 set -euo pipefail
-REPO="CortexRND/tracker"
+REPO="AnsweringRND/tracker"
 MARK="🔒 claim"
 
 need() { command -v "$1" >/dev/null || { echo "missing dependency: $1" >&2; exit 127; }; }
@@ -30,11 +30,11 @@ eligible() {
     --json number,title,labels,assignees,blockedBy,milestone \
     --jq '[ .[]
       | select([.labels[].name] | any(startswith("wayfinder:")) | not)
-      | select([.labels[].name] | any(. == "needs:taj") | not)
+      | select([.labels[].name] | any(. == "needs:carson") | not)
       | select(.assignees | length == 0)
       | select([.blockedBy.nodes[] | select(.state == "OPEN")] | length == 0)
       | { number, title,
-          product: ([.labels[].name | select(. == "cortex" or . == "conscience" or . == "cornea" or . == "suite" or . == "customers+sales")] | first // "-"),
+          product: ([.labels[].name | select(. == "answering" or . == "conscience" or . == "cornea" or . == "suite" or . == "customers+sales")] | first // "-"),
           priority: ([.labels[].name | select(. == "P0" or . == "P1")] | first // "P2"),
           milestone: (.milestone.title // "-") } ]
       | sort_by(.priority, .number)'

@@ -21,9 +21,9 @@ intermediate files go in `$TMPDIR`.
 ```
 
 One JSON object per line. The directory name is the session's working
-directory with `/` replaced by `-` (e.g. `/Users/taj/projs` →
-`-Users-taj-projs`, `/Users/taj/projs/cortex-brief` →
-`-Users-taj-projs-cortex-brief`). Roughly 31MB across ~8 project directories
+directory with `/` replaced by `-` (e.g. `/home/schmi/projs` →
+`-home-schmi-projs`, `/home/schmi/projs/answering-brief` →
+`-home-schmi-projs-answering-brief`). Roughly 31MB across ~8 project directories
 as of mid-2026 — small enough to scan whole with `cat … | jq`, so prefer one
 correct full pass over clever sampling.
 

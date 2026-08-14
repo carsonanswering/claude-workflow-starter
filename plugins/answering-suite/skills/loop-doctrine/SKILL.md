@@ -121,7 +121,7 @@ terminator; directive changes mid-session are re-Orient events, never restarts.
   blocking ALL remaining work. Once per event; record `notified_at` in the
   ledger so a persisting blocker never re-pushes.
 - Blocked-queue surfacing (non-interrupting): every declined/blocked task gets
-  a ledger entry (`blocked-on-taj`/`surfaced`) plus a DO-NOT-EXECUTE pickup
+  a ledger entry (`blocked-on-carson`/`surfaced`) plus a DO-NOT-EXECUTE pickup
   prompt with a content-keyed `surfaced-items:` marker (sorted item set;
   topic+date markers prohibited). A silent skip is a doctrine violation.
 - Session-end handoff (batch): aged surfaced items (>7 days: one line),

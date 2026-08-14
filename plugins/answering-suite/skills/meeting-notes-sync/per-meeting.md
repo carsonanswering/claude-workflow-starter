@@ -96,12 +96,12 @@ about 60 characters.
 
 ```markdown
 ---
-title: Cortex Brain design partner sync
+title: Answering design partner sync
 date: 2026-07-28
 start: 2026-07-28T09:30:00-06:00
 end: 2026-07-28T10:15:00-06:00
 attendees:
-  - taj.vasudeva@gmail.com
+  - schmidtcarson016@gmail.com
   - carson@example.com
 calendar_event_id: 7f3k9d2m1abc4efg5hij6klmn
 drive_file_id: 1AbCdEfGhIjKlMnOpQrStUvWxYz
@@ -127,7 +127,7 @@ signing.
 
 ## Action Items
 
-- **Taj** — send the RLS design note by Thursday.
+- **Carson** — send the RLS design note by Thursday.
 - **Carson** — collect the partner's channel inventory.
 
 ## Slack Context

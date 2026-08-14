@@ -5,10 +5,10 @@ Answering.com's complete Claude workflow suite: one repo that turns a fresh mach
 ## What lives where
 
 - `plugins/answering-suite/skills/` — all 32 skills, including `retell` (Retell AI voice/chat agent composer + validator) and `workflow-starter` (the flagship orchestration runbook).
-- `plugins/answering-suite/agents/` — 8 specialist subagents from the Cortex team suite (web-researcher, claim-verifier, prompt-engineer, test-triage, ...).
+- `plugins/answering-suite/agents/` — 8 specialist subagents from the Answering team suite (web-researcher, claim-verifier, prompt-engineer, test-triage, ...).
 - `.claude/agents/` — 3 suite-native roles: `voice-agent-engineer`, `workflow-qa`, `ai-employees-operator`. Available even before the plugin is installed.
 - `apps/ai-employees/` — the AI-employees company runner (Python, uv). Role-scoped employees, task queues, journals, standups.
-- `plugins/answering-suite/extras/` — optional kit: hooks, statusline, pi-delegation, scoped harnesses, original Cortex docs. Nothing here auto-loads.
+- `plugins/answering-suite/extras/` — optional kit: hooks, statusline, pi-delegation, scoped harnesses, original Answering docs. Nothing here auto-loads.
 - `install.sh` — Mac bootstrap. `README.md` — full manual.
 
 ## Kicking off work
@@ -25,5 +25,5 @@ The flagship entry point is the `workflow-starter` skill: give it a goal ("/work
 
 ## Machine notes
 
-- Some Cortex skills reference `/Users/taj/...` paths (obsidian-log, meeting-notes-sync, tracker-refresh, open-items, fw-delegate, pi-delegate, launchd-manage, push-and-brief, carson-update, repo-atlas, raise-research, frontier-orchestrator's dispatch notes). They run after you retarget those paths — see README "Path caveats".
+- Some Answering skills reference `/home/schmi/...` paths (obsidian-log, meeting-notes-sync, tracker-refresh, open-items, fw-delegate, pi-delegate, launchd-manage, push-and-brief, carson-update, repo-atlas, raise-research, frontier-orchestrator's dispatch notes). They run after you retarget those paths — see README "Path caveats".
 - `orchestration` and `orca-cli` skills expect the Orca binary; `tmux-fleet` and split-pane teams expect tmux. Slack-flavored skills (carson-update, slack-insights, comp-watch) need a Slack MCP connection.

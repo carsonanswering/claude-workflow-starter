@@ -33,9 +33,9 @@ this once, in the header line, so nobody treats stale numbers as fact.
 
 ## Input
 
-- **root** — optional. Default `/Users/taj/projs`.
+- **root** — optional. Default `/home/schmi/projs`.
 - **depth** — optional. Default: find repos at the root's immediate children and
-  one level of nesting below them (e.g. both `cortex/` and
+  one level of nesting below them (e.g. both `answering/` and
   `testing-framework/agentest/` are found). If the caller gives a depth, honor it.
 - **detail** — optional. Only when the caller explicitly asks for changed
   filenames do you list them, and only for repos with fewer than 5 changed files.
@@ -62,7 +62,7 @@ find "$DIR" -maxdepth 2 \( -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name
 ```
 
 Non-empty result = flag it in "needs attention" as `no version control`. As of this
-writing `/Users/taj/projs/callcopilot` is exactly this case; confirm rather than
+writing `/home/schmi/projs/callcopilot` is exactly this case; confirm rather than
 assume, since it may have been initialized since.
 
 ## Step 2 — gather per repo
@@ -102,7 +102,7 @@ above the header — no preamble, no "I'll now sweep your repos".
 
 | repo | branch | dirty | ahead/behind | remote | unmerged | last commit |
 |---|---|---|---|---|---|---|
-| cortex | main | 3 files | 20/0 | yes | fix/warm-cache, perf/embed | 2026-07-24 merge fireworks embeddings |
+| answering | main | 3 files | 20/0 | yes | fix/warm-cache, perf/embed | 2026-07-24 merge fireworks embeddings |
 ```
 
 Column rules:
@@ -118,7 +118,7 @@ Then:
 
 ```
 Needs attention:
-- cortex — 3 uncommitted files, 20 commits unpushed
+- answering — 3 uncommitted files, 20 commits unpushed
 - callcopilot — source files, no version control
 ```
 
@@ -134,11 +134,11 @@ stop — do not promote a minor detail just to have something to say.
 Everything quiet. Two repos, both clean and current.
 
 ```
-2 repos under /Users/taj/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
+2 repos under /home/schmi/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
 
 | repo | branch | dirty | ahead/behind | remote | unmerged | last commit |
 |---|---|---|---|---|---|---|
-| cortex | main | clean | 0/0 | yes | - | 2026-07-29 add MCP server skeleton |
+| answering | main | clean | 0/0 | yes | - | 2026-07-29 add MCP server skeleton |
 | skills | main | clean | 0/0 | yes | - | 2026-07-29 sync open-items skill |
 
 Needs attention: all clean
@@ -149,18 +149,18 @@ Needs attention: all clean
 The common messy case — unpushed work, a remote-less repo, a stale repo.
 
 ```
-4 repos under /Users/taj/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
+4 repos under /home/schmi/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
 
 | repo | branch | dirty | ahead/behind | remote | unmerged | last commit |
 |---|---|---|---|---|---|---|
-| cortex | main | 3 files · 1 stashed | 20/0 | yes | fix/warm-cache, perf/embed | 2026-07-24 merge fireworks embeddings |
-| cortex-brief | main | 7 files | no upstream | NONE | - | 2026-07-24 daily digest scheduler |
+| answering | main | 3 files · 1 stashed | 20/0 | yes | fix/warm-cache, perf/embed | 2026-07-24 merge fireworks embeddings |
+| answering-brief | main | 7 files | no upstream | NONE | - | 2026-07-24 daily digest scheduler |
 | meet-copilot | main | clean | 0/0 | yes | - | 2026-05-02 initial import |
 | skills | main | clean | 0/0 | yes | - | 2026-07-29 sync open-items skill |
 
 Needs attention:
-- cortex — 3 uncommitted files, 20 commits unpushed, 1 stash
-- cortex-brief — 7 uncommitted files, no remote configured
+- answering — 3 uncommitted files, 20 commits unpushed, 1 stash
+- answering-brief — 7 uncommitted files, no remote configured
 - meet-copilot — no commits in 89 days
 ```
 </example>

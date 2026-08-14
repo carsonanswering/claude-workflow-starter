@@ -7,7 +7,7 @@ from tests.conftest import EXAMPLE
 def test_load_toyco():
     company, employees = load_company(EXAMPLE)
     assert company.name == "toyco"
-    assert company.owner == "taj.vasudeva@gmail.com"
+    assert company.owner == "schmidtcarson016@gmail.com"
     assert len(company.goals) == 2
     assert len(company.constraints) == 3
     assert company.resources["email_api_key"] == "TOYCO_RESEND_KEY"

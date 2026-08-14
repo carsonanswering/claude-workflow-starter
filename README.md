@@ -1,6 +1,6 @@
 # claude-workflow-starter
 
-The complete Answering.com Claude workflow suite in one deployable repo: 32 skills (including the Retell AI voice/chat agent composer and a flagship `workflow-starter` orchestrator), 11 specialist subagents, the Cortex team's orchestration doctrine, the `ai-employees` company runner, and project settings that switch on Claude Code's experimental **agent teams**. Clone it on any Mac, run one script, and the machine is an orchestrated agent workstation.
+The complete Answering.com Claude workflow suite in one deployable repo: 32 skills (including the Retell AI voice/chat agent composer and a flagship `workflow-starter` orchestrator), 11 specialist subagents, the Answering team's orchestration doctrine, the `ai-employees` company runner, and project settings that switch on Claude Code's experimental **agent teams**. Clone it on any Mac, run one script, and the machine is an orchestrated agent workstation.
 
 ## 1. Publish this repo to GitHub (one-time)
 
@@ -65,7 +65,7 @@ Plugin skills are namespaced when invoked via the plugin (e.g. `answering-suite:
 
 ## 7. Subagents (11)
 
-From the Cortex suite (in the plugin): web-researcher, claim-verifier, prompt-engineer, test-triage, branch-verdict, repo-sweeper, session-log-analyst, slack-transcript-analyst. Suite-native (project-level, always available): voice-agent-engineer, workflow-qa, ai-employees-operator. All are usable both as delegated subagents and as agent-team teammate types ("Spawn a teammate using the workflow-qa agent type ...").
+From the Answering suite (in the plugin): web-researcher, claim-verifier, prompt-engineer, test-triage, branch-verdict, repo-sweeper, session-log-analyst, slack-transcript-analyst. Suite-native (project-level, always available): voice-agent-engineer, workflow-qa, ai-employees-operator. All are usable both as delegated subagents and as agent-team teammate types ("Spawn a teammate using the workflow-qa agent type ...").
 
 ## 8. ai-employees
 
@@ -73,10 +73,10 @@ From the Cortex suite (in the plugin): web-researcher, claim-verifier, prompt-en
 
 ## 9. Caveats you should actually read
 
-**Machine-specific paths.** These Cortex skills reference `/Users/taj/...` (Obsidian vault, `fw` CLI, project checkouts) and need retargeting before first use on your machine: carson-update, tracker-refresh, push-and-brief, obsidian-log, open-items, pi-delegate, repo-atlas, launchd-manage, fw-delegate, meeting-notes-sync, raise-research, and frontier-orchestrator's dispatch notes. Search: `grep -rl "/Users/taj" plugins/`.
+**Machine-specific paths.** These Answering skills reference `/home/schmi/...` (Obsidian vault, `fw` CLI, project checkouts) and need retargeting before first use on your machine: carson-update, tracker-refresh, push-and-brief, obsidian-log, open-items, pi-delegate, repo-atlas, launchd-manage, fw-delegate, meeting-notes-sync, raise-research, and frontier-orchestrator's dispatch notes. Search: `grep -rl "/home/schmi" plugins/`.
 
-**External dependencies.** `orchestration` and `orca-cli` require the Orca binary; `tmux-fleet` and split-pane teams require tmux; carson-update / slack-insights / comp-watch expect a Slack MCP connection; daily-brief and meeting-notes-sync expect Google Workspace MCPs; `carson-update` is written from Taj's perspective posting to Carson — repurpose or drop it as you like.
+**External dependencies.** `orchestration` and `orca-cli` require the Orca binary; `tmux-fleet` and split-pane teams require tmux; carson-update / slack-insights / comp-watch expect a Slack MCP connection; daily-brief and meeting-notes-sync expect Google Workspace MCPs; `carson-update` posts Carson's progress update to their cofounder in #code-updates.
 
-**Extras don't auto-load.** `plugins/answering-suite/extras/` holds the Cortex hooks (session logging, self-improve, auto-title, usage dashboard), statusline, pi-delegation prompts, and scoped harnesses. They're inert until you wire them — see `extras/hooks/README.md`.
+**Extras don't auto-load.** `plugins/answering-suite/extras/` holds the Answering hooks (session logging, self-improve, auto-title, usage dashboard), statusline, pi-delegation prompts, and scoped harnesses. They're inert until you wire them — see `extras/hooks/README.md`.
 
-**License.** Cortex skills and ai-employees are your team's internal code; the repo is marked private/proprietary. Don't make this repo public without scrubbing team-internal references first.
+**License.** Answering skills and ai-employees are your team's internal code; the repo is marked private/proprietary. Don't make this repo public without scrubbing team-internal references first.

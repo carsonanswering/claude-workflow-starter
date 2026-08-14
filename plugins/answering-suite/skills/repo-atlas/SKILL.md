@@ -1,11 +1,11 @@
 ---
 name: repo-atlas
-description: Regenerates the Obsidian atlas of the projs monorepo (Atlas.md hub, per-project notes, domain MOCs, Bases table, JSON Canvas, graph colorGroups) and classifies any new top-level dirs. Use when the user says "/repo-atlas", "regenerate the atlas", "update the monorepo map", "the atlas is stale", or right after a top-level directory is added to, renamed in, or removed from /Users/taj/projs.
+description: Regenerates the Obsidian atlas of the projs monorepo (Atlas.md hub, per-project notes, domain MOCs, Bases table, JSON Canvas, graph colorGroups) and classifies any new top-level dirs. Use when the user says "/repo-atlas", "regenerate the atlas", "update the monorepo map", "the atlas is stale", or right after a top-level directory is added to, renamed in, or removed from /home/schmi/projs.
 ---
 
 # Repo atlas
 
-`/Users/taj/projs` **is** an Obsidian vault (`.obsidian/` sits at its root). The atlas is the
+`/home/schmi/projs` **is** an Obsidian vault (`.obsidian/` sits at its root). The atlas is the
 generated map of that vault: it turns every top-level project dir into a linked note so the
 monorepo is navigable in Obsidian instead of only in the shell.
 
@@ -22,13 +22,13 @@ Everything under `atlas/` **except** `atlas/gen/` is rewritten from scratch on e
 | `atlas/Atlas.canvas` | JSON Canvas map |
 | `.obsidian/graph.json` | colorGroups merged in non-destructively; backup at `graph.json.atlas-backup` |
 
-Full contract: `/Users/taj/projs/atlas/gen/SPEC.md`. Read it only when behavior contradicts this
+Full contract: `/home/schmi/projs/atlas/gen/SPEC.md`. Read it only when behavior contradicts this
 runbook.
 
 ## Run it
 
 ```bash
-cd /Users/taj/projs/atlas/gen && .venv/bin/python -m atlas_gen
+cd /home/schmi/projs/atlas/gen && .venv/bin/python -m atlas_gen
 ```
 
 Run `--dry-run` first (prints planned writes and deletes, writes nothing) when the user is
@@ -52,7 +52,7 @@ Obsidian sync quiet; that is success, not a no-op failure.
 ## Handle Unclassified
 
 New top-level dirs land in `atlas/Atlas.md` under `## Unclassified` until they are added to
-`/Users/taj/projs/atlas/gen/atlas_config.json`. That file is the only curated input — classify
+`/home/schmi/projs/atlas/gen/atlas_config.json`. That file is the only curated input — classify
 there, never by editing a generated note.
 
 When the summary line lands, check whether the run reported unclassified dirs. If so, tell the
@@ -60,12 +60,12 @@ user which dirs are unclassified and offer to classify them. On a yes, add one e
 under the top-level `projects` object, keyed by the directory name verbatim:
 
 ```json
-"cortex-brief": {
-  "display_name": "Cortex Brief",
+"answering-brief": {
+  "display_name": "Answering Brief",
   "type": "tool",
-  "domain": "Cortex Brain",
+  "domain": "Answering",
   "purpose": "One sentence, present tense, describing what this repo is for.",
-  "relations": [{ "kind": "feeds", "target": "cortex-raise" }],
+  "relations": [{ "kind": "feeds", "target": "answering-raise" }],
   "key_files": ["README.md"]
 }
 ```
@@ -97,7 +97,7 @@ On a traceback or nonzero exit, stop and diagnose — do not re-run the same com
 different result. Run the suite:
 
 ```bash
-cd /Users/taj/projs/atlas/gen && .venv/bin/python -m pytest tests -q
+cd /home/schmi/projs/atlas/gen && .venv/bin/python -m pytest tests -q
 ```
 
 Report which tests fail alongside the traceback, and let the user decide whether to fix the
@@ -114,7 +114,7 @@ open the vault in Obsidian once or re-run with `--skip-graph-json`.
   deliberately leaves files that lack a `generated: true` line, so a leftover file is a signal
   someone wrote it by hand
 - committing or pushing the regenerated atlas
-- running with `--root` pointed anywhere other than `/Users/taj/projs`
+- running with `--root` pointed anywhere other than `/home/schmi/projs`
 
 ## Reporting
 

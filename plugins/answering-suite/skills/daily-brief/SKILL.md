@@ -1,11 +1,11 @@
 ---
 name: daily-brief
-description: Daily industry brief for the AI-agent / company-brain space — what moved in 24h that changes a Cortex Brain decision, posted to Slack. Use when the user says "/daily-brief", "brief me", or "what happened in the space". For competitor-specific tracking use comp-watch instead.
+description: Daily industry brief for the AI-agent / AI-answering space — what moved in 24h that changes a Answering decision, posted to Slack. Use when the user says "/daily-brief", "brief me", or "what happened in the space". For competitor-specific tracking use comp-watch instead.
 ---
 
 # daily-brief
 
-The morning read for Taj and Carson: what moved in the last 24 hours that changes
+The morning read for Carson and Carson: what moved in the last 24 hours that changes
 a decision. Not a news feed — a decision feed.
 
 Repo: the repo root (current checkout). Read `core/DOCTRINE.md` first — it
@@ -47,7 +47,7 @@ in the step 4 footer.
 ### 2. Score
 
 Give every candidate a `so_what` — one sentence naming the concrete implication
-for Cortex Brain. If the `so_what` can't be made specific, drop the item.
+for Answering. If the `so_what` can't be made specific, drop the item.
 "This shows AI is moving fast" is not a `so_what`.
 
 ### 3. Diff
@@ -100,7 +100,7 @@ exposes. Per item:
 • *<headline>* — <one line, what happened>. <so_what> <url|source>
 ```
 
-Close with one `*Worth a decision:*` line naming the single item that needs Taj
+Close with one `*Worth a decision:*` line naming the single item that needs Carson
 or Carson to act. Omit the line entirely if nothing does — do not invent an
 action to fill it.
 

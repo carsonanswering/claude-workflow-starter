@@ -4,7 +4,7 @@
 
 ## Route to the right template
 
-The email skeletons already exist in `/Users/taj/projs/cortex-raise/templates/` and are enforced by `bin/gate.py`. Use them; do not re-invent a shape here.
+The email skeletons already exist in `/home/schmi/projs/answering-raise/templates/` and are enforced by `bin/gate.py`. Use them; do not re-invent a shape here.
 
 | Situation | Template |
 |---|---|
@@ -22,7 +22,7 @@ Not covered by the email templates, and the only shape drafted here. Same gate, 
 {Hook — one clause naming something they published or funded, with a date.
 Must resolve to a live URL you fetched.}
 
-{One sentence on what Cortex Brain is, in their vocabulary. Exactly one
+{One sentence on what Answering is, in their vocabulary. Exactly one
 verified ledger claim id.}
 
 {The ask — a reply, not a meeting. "Worth a longer note?" beats a calendar
@@ -34,7 +34,7 @@ Bounds: 45 words or fewer, one claim, no link on the first message, no amount or
 ## Bars that hold across every shape
 
 - **No amount, valuation, cap, or terms in any outbound message.** Stating them in mass cold outreach is arguably general solicitation and risks the 506(b) exemption the round relies on. Ask for a conversation instead.
-- **Exactly one factual claim about Cortex per message**, mapped to a `verified` id in `claims/ledger.json`. Every extra claim is another chance to assert something that is not true yet.
+- **Exactly one factual claim about Answering per message**, mapped to a `verified` id in `claims/ledger.json`. Every extra claim is another chance to assert something that is not true yet.
 - **Every personalization hook resolves to a live, dated URL you fetched.** A 404 is the shape a hallucinated source takes.
 - **Two touches maximum, ever.** Any reply suppresses all follow-ups; `core/journal.py:touch_count` is the authority, not a state file.
 - **A failing draft is never rewritten to pass.** It goes to `data/drafts/held/` with its reasons, and the fix is to correct the claim or cut the sentence.
@@ -44,11 +44,11 @@ Bounds: 45 words or fewer, one claim, no link on the first message, no amount or
 Run the truth gate over the drafts:
 
 ```bash
-cd /Users/taj/projs/cortex-raise
+cd /home/schmi/projs/answering-raise
 python3 bin/gate.py --all              # denylist, claim mapping, hook resolution, adversarial judge
 python3 bin/gate.py --all --no-judge   # checks 1-3, offline
 ```
 
 The judge fails closed — a judge that cannot run holds the draft rather than releasing it.
 
-Then stop. Sending, adding a target to the send pipeline, and loosening the ledger to let a draft through are Taj's calls, and a gate that passed is not permission to send.
+Then stop. Sending, adding a target to the send pipeline, and loosening the ledger to let a draft through are Carson's calls, and a gate that passed is not permission to send.

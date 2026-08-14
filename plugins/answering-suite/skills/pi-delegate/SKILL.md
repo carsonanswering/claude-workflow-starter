@@ -13,7 +13,7 @@ description: >-
 **Every `pi` and `tmux` command in this file needs `dangerouslyDisableSandbox: true` on the Bash call.** `pi` writes lockfiles and session transcripts under `~/.pi/agent/`, which the sandbox denies. Without the flag the very first command dies with:
 
 ```
-EPERM: operation not permitted, mkdir '/Users/taj/.pi/agent/settings.json.lock'
+EPERM: operation not permitted, mkdir '/home/schmi/.pi/agent/settings.json.lock'
 ```
 
 That error names a lockfile, not a sandbox, so it reads like a broken install — it isn't. Scope the flag to the `pi`/`tmux` call itself; nothing else here needs it.
@@ -132,4 +132,4 @@ Valid tool names: `read`, `grep`, `find`, `ls`, `bash`, `edit`, `write`. Anythin
 
 ## Reference
 
-Full operator manual: `~/.pi/agent/README-delegation.md`, mirrored to the shared team repo at `/Users/taj/projs/skills/pi-delegation/`.
+Full operator manual: `~/.pi/agent/README-delegation.md`, mirrored to the shared team repo at `/home/schmi/projs/skills/pi-delegation/`.

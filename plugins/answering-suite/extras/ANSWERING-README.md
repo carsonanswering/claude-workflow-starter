@@ -12,7 +12,7 @@ Shared Claude Code skills, agents, and hooks for the team.
 ## Install
 
 ```bash
-git clone https://github.com/CortexRND/skills.git
+git clone https://github.com/AnsweringRND/skills.git
 cp -R skills/skills/* ~/.claude/skills/
 cp skills/agents/*.md ~/.claude/agents/        # or into a project's .claude/agents/
 cp skills/hooks/*.py skills/hooks/*.sh ~/.claude/hooks/
@@ -34,11 +34,11 @@ find mattpocock-skills/skills/engineering mattpocock-skills/skills/productivity 
   done
 ```
 
-Those skills read their per-repo config from `docs/agents/` — `issue-tracker.md`, `triage-labels.md`, `domain.md`. This repo's copies are set up for GitHub Issues on `CortexRND/skills`, the default triage label vocabulary, and a single-context domain layout.
+Those skills read their per-repo config from `docs/agents/` — `issue-tracker.md`, `triage-labels.md`, `domain.md`. This repo's copies are set up for GitHub Issues on `AnsweringRND/skills`, the default triage label vocabulary, and a single-context domain layout.
 
 ## Caveats
 
-- Several skills and hooks reference absolute paths under `/Users/taj/` (Obsidian vault, `fw` CLI, project checkouts). Adjust paths for your machine before use.
+- Several skills and hooks reference absolute paths under `/home/schmi/` (Obsidian vault, `fw` CLI, project checkouts). Adjust paths for your machine before use.
 - `open-items` and `running-view` keep runtime state (`items.json`, `state.json`, `out/`) that is intentionally not committed here — the skills create their own on first run.
 - Some skills depend on connected MCP servers (Slack, Google Calendar/Gmail/Drive) being available in your Claude Code session.
 

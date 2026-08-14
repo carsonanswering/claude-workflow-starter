@@ -1,9 +1,9 @@
 # Instructions
 
-<!-- Canonical projs-root CLAUDE.md. Source of truth: CortexRND/skills/projs-CLAUDE.md
+<!-- Canonical projs-root CLAUDE.md. Source of truth: AnsweringRND/skills/projs-CLAUDE.md
      — copy to <projs root>/CLAUDE.md on any machine (Windows: C:\projs\CLAUDE.md). -->
 
-- Start every message by addressing the user as "Taj". (Canary: confirms this file is loaded.)
+- Start every message by addressing the user as "Carson". (Canary: confirms this file is loaded.)
 
 ## Role: advisor, not helper
 
@@ -13,15 +13,15 @@
 
 ## Repos and planning
 
-- Canonical product repo: `cortex/` (github.com/CortexRND/cortex). The vision doc at `cortex/docs/vision/understand-the-cortex-vision.md` is CANONICAL — it wins every disagreement. `meeting-copilot/`, `meet-copilot/`, `callcopilot/` are legacy pre-pivot variants; no active work there.
-- Planning lives in `CortexRND/tracker` (issues, dependencies, milestones) — never in code-repo issues. Per-repo agent config in `cortex/docs/agents/` routes gh commands there.
+- Canonical product repo: `answering/` (github.com/AnsweringRND/answering). The vision doc at `answering/docs/vision/understand-the-answering-vision.md` is CANONICAL — it wins every disagreement. `meeting-copilot/`, `meet-copilot/`, `callcopilot/` are legacy pre-pivot variants; no active work there.
+- Planning lives in `AnsweringRND/tracker` (issues, dependencies, milestones) — never in code-repo issues. Per-repo agent config in `answering/docs/agents/` routes gh commands there.
 - Branch naming for tracker work: `agent/issue-<n>`.
 
 ## Skills, workflows, agent teams
 
-- **Team skills** (from `CortexRND/skills`, installed to `~/.claude/skills`): carson-update, comp-watch, daily-brief, day-plan, find-skills, frontier-orchestrator, fw-delegate, handoff, lightning, loop-doctrine, meeting-notes-sync, obsidian-log, ooda, open-items, orca-cli, oss-session, running-view, slack-insights, solve-issues, tracker-refresh. Standing rule: any new/updated skill, agent, or hook syncs back to that repo.
-- **Engineering skills** (mattpocock/skills, installed alongside): triage, to-tickets, to-spec, implement, tdd, code-review, diagnosing-bugs, wayfinder, grilling, prototype, research, domain-modeling, and friends. **Standing directive (Taj, 2026-07-30): use /wayfinder for planned building** — map the decision space before committing build effort. These skills read per-repo config from `docs/agents/` (issue tracker routing, label vocabulary, domain docs).
-- **Agent team** (from `CortexRND/skills/agents`, installed to `~/.claude/agents`): branch-verdict (one branch → merge verdict, worktree-isolated), claim-verifier (truth-check outbound claims against repo state), prompt-engineer (all prompt authoring — never draft prompts inline), repo-sweeper (read-only git state sweep), session-log-analyst, slack-transcript-analyst, test-triage, web-researcher. Fan out to these instead of doing their jobs inline; treat their reports as observations to re-orient on.
+- **Team skills** (from `AnsweringRND/skills`, installed to `~/.claude/skills`): carson-update, comp-watch, daily-brief, day-plan, find-skills, frontier-orchestrator, fw-delegate, handoff, lightning, loop-doctrine, meeting-notes-sync, obsidian-log, ooda, open-items, orca-cli, oss-session, running-view, slack-insights, solve-issues, tracker-refresh. Standing rule: any new/updated skill, agent, or hook syncs back to that repo.
+- **Engineering skills** (mattpocock/skills, installed alongside): triage, to-tickets, to-spec, implement, tdd, code-review, diagnosing-bugs, wayfinder, grilling, prototype, research, domain-modeling, and friends. **Standing directive (Carson, 2026-07-30): use /wayfinder for planned building** — map the decision space before committing build effort. These skills read per-repo config from `docs/agents/` (issue tracker routing, label vocabulary, domain docs).
+- **Agent team** (from `AnsweringRND/skills/agents`, installed to `~/.claude/agents`): branch-verdict (one branch → merge verdict, worktree-isolated), claim-verifier (truth-check outbound claims against repo state), prompt-engineer (all prompt authoring — never draft prompts inline), repo-sweeper (read-only git state sweep), session-log-analyst, slack-transcript-analyst, test-triage, web-researcher. Fan out to these instead of doing their jobs inline; treat their reports as observations to re-orient on.
 - **Workflows**: frontier-orchestrator (frontier model plans/synthesizes, cheap models execute); overnight fleets run one agent per independent task in isolated worktrees, commit only listed files; before any status update goes outward, claim-verifier audits it.
 
 ## Delegation

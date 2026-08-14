@@ -16,7 +16,7 @@ This skill is how you build one harness for the task in front of you. `pi-delega
 **Every Bash call that runs `pi` or `tmux` needs `dangerouslyDisableSandbox: true`.** `pi` writes lockfiles under `~/.pi/agent/`; the sandbox denies it and the first command dies with:
 
 ```
-EPERM: operation not permitted, mkdir '/Users/taj/.pi/agent/settings.json.lock'
+EPERM: operation not permitted, mkdir '/home/schmi/.pi/agent/settings.json.lock'
 ```
 
 That names a lockfile, not a sandbox, so it reads like a broken install. It isn't. `ollama`, `curl` and `jq` calls need no flag.
@@ -53,7 +53,7 @@ Provider reference: `/opt/homebrew/lib/node_modules/@earendil-works/pi-coding-ag
 
 **Budget the context the server actually serves, not the one pi declares, and read it every session.** pi sends no `num_ctx` (zero occurrences in its `dist/`), so Ollama serves its own configured window and pi's declared number only drives pi's token accounting. Measured on this machine: `ollama ps` reported `CONTEXT 8192` on one load and `16384` on another for `qwen3.6:35b-mlx`, while models.json declared 65536 and `ollama show` reports a native ceiling of 262144. The served number is **not stable across loads — read it, do not memorise it.** Over-length input is dropped by the server with no error on either side, **from the front** (`local-delegate`, exit 7), so the harness itself is what disappears and the model answers fluently from a fragment. Size every paste against the `ollama ps` CONTEXT column of the load you are about to use, or raise `OLLAMA_CONTEXT_LENGTH` and re-read it.
 
-**Budget the RAM.** `qwen3.6:35b-mlx` is 21GB on disk; resident it measured 21–22GB across this session's loads and 27GB at `lo`'s default `--ctx` (`local-delegate` rule 7) on this 48GB machine. pi sends no `keep_alive` either, so a pi-driven load holds for Ollama's own default rather than the 15m you get from `lo` (that 15m is `lo`'s argparse default, `/Users/taj/.local/bin/lo:169`). Read the `UNTIL` column in `ollama ps` before switching models mid-queue; two co-resident models make the third load thrash.
+**Budget the RAM.** `qwen3.6:35b-mlx` is 21GB on disk; resident it measured 21–22GB across this session's loads and 27GB at `lo`'s default `--ctx` (`local-delegate` rule 7) on this 48GB machine. pi sends no `keep_alive` either, so a pi-driven load holds for Ollama's own default rather than the 15m you get from `lo` (that 15m is `lo`'s argparse default, `/home/schmi/.local/bin/lo:169`). Read the `UNTIL` column in `ollama ps` before switching models mid-queue; two co-resident models make the third load thrash.
 
 **Budget the clock, and know the ceiling.** One harness call: Bash `timeout` 180000 ms — generous on purpose, because warm harnessed calls with stdin closed measured **6s, 7s, 16s and 16s**. **The Bash tool's own maximum is 600000 ms**, and it was hit twice in one measured session — both times by calls stalled on an open stdin, never by slow inference. Close stdin and that ceiling stops being a live risk on single-file work. A serial queue of more than ~3 items still cannot fit in one foreground call at the 180s per-item cap: run the queue with `run_in_background: true`, give every item its own cap, and poll the per-item output files. **Always redirect a dispatch to a file** (`> "$OUT/out-<slug>.txt"`): when a call does blow the budget the tool kills it and unredirected output is lost entirely — no partial answer, no diagnosis.
 
@@ -174,8 +174,8 @@ Write the harness to **one fixed absolute path** and reference that same literal
 
 ```bash
 mkdir -p ~/.pi/agent/harnesses ~/.pi/agent/logs/harness-runs   # once
-H=/Users/taj/.pi/agent/harnesses/bugfind.md
-OUT=/Users/taj/.pi/agent/logs/harness-runs
+H=/home/schmi/.pi/agent/harnesses/bugfind.md
+OUT=/home/schmi/.pi/agent/logs/harness-runs
 ```
 
 `$H`:
@@ -289,8 +289,8 @@ Opus keeps decomposition, synthesis, conflict resolution, and every judgment who
 **Concurrency is 1, and no item gets to run forever.** Build the harnesses in parallel (that is just writing files), then run them one at a time, each in the background under its own cap, so one pathological item cannot consume the whole budget. Index every output and check each item — `basename` alone collides (`tests/api/test_client.py` and `tests/worker/test_client.py` write the same file and the second silently wins), and a stalled or spun item leaves a 0-byte file that reads exactly like "no findings":
 
 ```bash
-H=/Users/taj/.pi/agent/harnesses/bugfind.md
-OUT=/Users/taj/.pi/agent/logs/harness-runs; mkdir -p "$OUT"
+H=/home/schmi/.pi/agent/harnesses/bugfind.md
+OUT=/home/schmi/.pi/agent/logs/harness-runs; mkdir -p "$OUT"
 CAP=180                       # seconds per item; a stalled item is a FAILED item, not one to wait on
 i=0
 for f in /abs/path/a.py /abs/path/b.py; do
@@ -318,7 +318,7 @@ Applied rules, with the local specifics:
 - **Every guardrail goes in this harness, in its own words.** The pi roster's agent files carry none of yours, and a verdict you reached but never transmitted has no effect — the model runs its own default.
 - **Isolation is structural, never prose.** A harness that edits gets `--tools read,edit` and a dedicated git worktree as its cwd. There is no `-d` on `pi` — it exits `Error: Unknown option: -d` — so for `pi -p` the worktree is the Bash call's own cwd: `cd /abs/path/worktree && pi -p ...`. Only the detached form takes a directory flag (`pi-spawn -d /abs/path/worktree`). pi resolves relative paths and project trust from the process cwd, so the `cd` is what actually scopes it. Probe `git rev-parse --git-dir` from that cwd first, because outside a repo there is no isolation to have. Bar commit/push with a hook gated on an env var, not with a sentence.
 - **Every return carries its evidence, as required contract keys.** `CLAIM:`, `COMMAND:` (the exact line run, with its real output), `NOT_EXERCISED:` (mocked, skipped, unapplied, no live DB — `none` is a legal value, absence is not). Optional fields are the first thing a 35B model drops, so make all three required lines of the contract — the same reason `STATUS:` and `REASON:` are required rather than conditional.
-- **Never self-authorize past a guard addressed to a human.** Pushing to a remote, merging, deleting or overwriting outside the named lane, changing collaborator or org settings, spending money, or anything outward-facing stops and comes back to Taj. A harness that hits such a guard returns `STATUS: ESCALATE` — it never sets the override flag itself, and a blocked harness never hands the action to the next item in the queue.
+- **Never self-authorize past a guard addressed to a human.** Pushing to a remote, merging, deleting or overwriting outside the named lane, changing collaborator or org settings, spending money, or anything outward-facing stops and comes back to Carson. A harness that hits such a guard returns `STATUS: ESCALATE` — it never sets the override flag itself, and a blocked harness never hands the action to the next item in the queue.
 - **Compact returns only.** The contract is what keeps the harness's 40k tokens of reading out of your window; a return that pastes file contents has broken the contract even when it is correct.
 - **The write-up is its own turn.** Workers finish the work and drop the trailing non-code step. Send a second, separate dispatch containing only the write-up ask.
 - **The author never verifies its own fix.** A fresh harness with no shared context checks it, and its brief says falsifying beats blessing.
@@ -328,7 +328,7 @@ Applied rules, with the local specifics:
 
 | Symptom you would actually see | Cause | Fix |
 |---|---|---|
-| `EPERM ... mkdir '/Users/taj/.pi/agent/settings.json.lock'` on the first command | Sandbox denies pi's lockfile | `dangerouslyDisableSandbox: true` on the Bash call |
+| `EPERM ... mkdir '/home/schmi/.pi/agent/settings.json.lock'` on the first command | Sandbox denies pi's lockfile | `dangerouslyDisableSandbox: true` on the Bash call |
 | The dispatch never returns; stdout *and* stderr are both 0 bytes; the Bash call is killed at the ceiling | `pi -p` inherited the Bash tool's open stdin pipe and blocks on it. Nothing about the model, the input or the output volume changed | Append `< /dev/null` to every dispatch. Measured on one command, same warm model, same file: >600s and 0 bytes without it (three times), 16s and a full contract with it |
 | `Error: Unknown option: -d` | `pi` has no working-directory flag; only `pi-spawn` does | `cd <worktree> && pi -p ...`, or `pi-spawn -d <worktree>` |
 | Fluent, unconstrained *prose*; no `NONCE:` line | The harness path did not exist, so pi appended the path string as literal system prompt text | `test -s "$H"`; never build the path from `$$` |
@@ -374,6 +374,6 @@ Body: the same role sentence, rules, both worked examples, and the nonce-first
 
 There is no `--agent` flag: a promoted agent is reachable only through the `subagent` tool from a parent `pi` session, so the parent must keep extensions on (no `-ne`) **and list `subagent` in its own allowlist** (`--tools subagent`, or `--tools read,subagent`) — `--tools` filters extension tools too, so a parent running the recommended `--tools read` sees no `subagent` and the promoted agent is unreachable with no error pointing at the allowlist. The parent is itself a local call: two calls, still one at a time. The pi `subagent` parallel form (`{tasks:[...]}`, max 8, 4 concurrent) is the contention case on this substrate; leave it to `scoped-harness-fw`.
 
-Then record the agent in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/Users/taj/projs/skills/` and push.
+Then record the agent in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/home/schmi/projs/skills/` and push.
 
 Roster, `pi-spawn` flags, prompt templates and chains: skill `pi-delegate`. Operator manual: `~/.pi/agent/README-delegation.md`. Doctrine this skill instantiates: `team-orchestration`, `frontier-orchestrator`, `lightning`, `ooda`.

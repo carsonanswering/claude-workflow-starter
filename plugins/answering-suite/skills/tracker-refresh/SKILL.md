@@ -1,6 +1,6 @@
 ---
 name: tracker-refresh
-description: Refreshes the CortexRND tracker dashboard artifact — claimed and in-flight issues, work ready for agents, decisions waiting on Taj.
+description: Refreshes the AnsweringRND tracker dashboard artifact — claimed and in-flight issues, work ready for agents, decisions waiting on Carson.
 disable-model-invocation: true
 ---
 
@@ -21,7 +21,7 @@ It prints one summary line: `open=N inflight=N ready=N needsyou=N out=<path> url
 
 3. Reply with ONLY the summary numbers and the artifact link. Do not open or describe `dashboard.html`.
 
-If the script exits non-zero or its Python step raises on empty/invalid `viz-data.json`, the `gh` fetch inside `projs/tracker-live/build.sh` failed — and that script truncates `tracker.json` with `> tracker.json` before `gh` runs, so the data chain is already blown away. Leave the old artifact standing (a stale dashboard beats a blank one), run `cd /Users/taj/projs/tracker-live && ./build.sh` to surface the real error (usually `gh auth status` or network), fix that and rerun step 1. If it fails a second time, tell Taj which command failed and with what error instead of publishing.
+If the script exits non-zero or its Python step raises on empty/invalid `viz-data.json`, the `gh` fetch inside `projs/tracker-live/build.sh` failed — and that script truncates `tracker.json` with `> tracker.json` before `gh` runs, so the data chain is already blown away. Leave the old artifact standing (a stale dashboard beats a blank one), run `cd /home/schmi/projs/tracker-live && ./build.sh` to surface the real error (usually `gh auth status` or network), fix that and rerun step 1. If it fails a second time, tell Carson which command failed and with what error instead of publishing.
 
 There is nothing to delegate: the pipeline is a `gh` query, a `jq` reshape, and a template fill; only the Artifact publish needs a session.
 

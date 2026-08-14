@@ -29,14 +29,14 @@ Anywhere a one-shot call over text suffices — the description lists the shapes
 
 ## Route elsewhere instead
 
-- Tool use, file edits, or repo-wide context → a `claude-oss -p` worker (read `/Users/taj/.claude/skills/oss-session/SKILL.md` — user-invoked, not reachable by skill name) or a Claude subagent; `fw` has no tools and sees only what you paste.
+- Tool use, file edits, or repo-wide context → a `claude-oss -p` worker (read `/home/schmi/.claude/skills/oss-session/SKILL.md` — user-invoked, not reachable by skill name) or a Claude subagent; `fw` has no tools and sees only what you paste.
 - Multi-step reasoning where an early error compounds → keep it inline, or cut it into single-step `fw` calls you check between.
 - Decisions → yours. `fw` output informs.
 - Tasks smaller than the Bash round trip → answer inline.
 
 ## Rules
 
-1. Pick `oss` for mechanical work, `ds` only when quality matters — deepseek burns paid thinking tokens and is slower to first token (figures in `/Users/taj/.claude/skills/oss-session/SKILL.md`).
+1. Pick `oss` for mechanical work, `ds` only when quality matters — deepseek burns paid thinking tokens and is slower to first token (figures in `/home/schmi/.claude/skills/oss-session/SKILL.md`).
 2. Treat output as untrusted draft: verify claims against the actual code/data before acting on them.
 3. For JSON pipelines, always pass `-j` and validate the parse; retry once with the parse error appended on failure.
 4. Fan-out is fine: loop `fw` over many files in one Bash call, collect results, synthesize yourself. The fan-out is done when every input has either a result or a named failure — retry each failure once, then report which inputs are missing rather than synthesizing over a silent gap.

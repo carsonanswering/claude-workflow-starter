@@ -1,15 +1,15 @@
 ---
 name: solve-issues
-description: Pick up open CortexRND/tracker issues nobody else is working on and open a pull request per issue. Use when Taj says '/solve-issues', 'work the tracker', or names a specific tracker issue to work. Not for filing issues or for wayfinder maps.
+description: Pick up open AnsweringRND/tracker issues nobody else is working on and open a pull request per issue. Use when Carson says '/solve-issues', 'work the tracker', or names a specific tracker issue to work. Not for filing issues or for wayfinder maps.
 ---
 
 # solve-issues
 
-Work the CortexRND/tracker frontier autonomously, without colliding with another Claude Code session doing the same thing.
+Work the AnsweringRND/tracker frontier autonomously, without colliding with another Claude Code session doing the same thing.
 
 Everything in this file binds the **worker** — the session doing one issue. Dispatching workers instead of working an issue yourself? Read [orchestrator.md](orchestrator.md) before writing any brief — token rules, lane partition, requesting the brief, closing the lease.
 
-Helper: `/Users/taj/projs/.claude/skills/solve-issues/tracker.sh`. Every invocation below spells out that absolute path, because step 4 moves you into a worktree that has no `.claude` of its own. All commands assume it is executable and that `gh` is authenticated.
+Helper: `/home/schmi/projs/.claude/skills/solve-issues/tracker.sh`. Every invocation below spells out that absolute path, because step 4 moves you into a worktree that has no `.claude` of its own. All commands assume it is executable and that `gh` is authenticated.
 
 ## The concurrency problem, and why the lease exists
 
@@ -27,12 +27,12 @@ Every `claim`, `release`, and `finish` needs it. If you were dispatched with som
 
 ## What is eligible
 
-`tracker.sh next` returns open issues that are unassigned, have no open blocker, carry no `wayfinder:*` label, and are not labelled `needs:taj`.
+`tracker.sh next` returns open issues that are unassigned, have no open blocker, carry no `wayfinder:*` label, and are not labelled `needs:carson`.
 
 Those exclusions are deliberate:
 
 - **`wayfinder:*`** — map tickets are human-in-the-loop by design. A grilling ticket resolved by an agent answering its own questions is a broken ticket. Leave maps to `/wayfinder`.
-- **`needs:taj`** — the issue needs a founder decision (spending money, signing something, contacting a customer, naming something customers will see). Its pickup prompt says which. Working it without the answer produces confidently wrong work.
+- **`needs:carson`** — the issue needs a founder decision (spending money, signing something, contacting a customer, naming something customers will see). Its pickup prompt says which. Working it without the answer produces confidently wrong work.
 - **Open blockers** — the tracker's dependency edges are real. Starting a blocked issue means building on something that may still change.
 
 ## The environment guards, and how to work inside them
@@ -41,10 +41,10 @@ Three guards exist in this repo. All three look like failures when you first hit
 
 **1. Sandboxed network calls fail TLS.** `gh` and every git network operation fail inside the sandbox with `tls: failed to verify certificate: x509: OSStatus -26276`. The sandbox's certificate store cannot verify GitHub. Run **those calls only** with `dangerouslyDisableSandbox: true` — `gh` commands, `tracker.sh` (it is a `gh` wrapper), `git push`, `git fetch`. Keep everything else sandboxed: builds, tests, and edits have no reason to leave the machine, and a blanket disable removes the guard from the operations that actually need it.
 
-**2. Git hooks gate commit and push on `CORNEA_GIT_OK=1`.** `/Users/taj/projs/cortex/.git/hooks/pre-commit` and `.../pre-push` exist and may be added or changed mid-session. Worktrees share these hooks with the main checkout. **Read the hook before using any override you were told about** — the two hooks say different things and grant different authority:
+**2. Git hooks gate commit and push on `CORNEA_GIT_OK=1`.** `/home/schmi/projs/answering/.git/hooks/pre-commit` and `.../pre-push` exist and may be added or changed mid-session. Worktrees share these hooks with the main checkout. **Read the hook before using any override you were told about** — the two hooks say different things and grant different authority:
 
-- `pre-commit` prints "Subagents are not authorized to commit. Orchestrator: prefix the command with `CORNEA_GIT_OK=1`." Read literally that is ambiguous for a dispatched worker, which is a subagent. **Taj has settled it: a worker running this skill may commit with the override.** "Orchestrator" means the orchestrated run, not one specific agent. Prefix `CORNEA_GIT_OK=1 git commit ...` and say in your report that you used it. If you ever meet a *different* guard whose text does not clearly cover the agent about to act, do not resolve it by picking the reading that unblocks you — stop and ask.
-- `pre-push` reserves the action for Taj by name: "Pushing requires explicit authorization from Taj." Setting the flag yourself to push is self-authorizing an outward-facing action the hook says is not yours to take. **Stop and ask.** Push only after Taj has authorized it in this session, and say in your report that you used the override and who authorized it. A locally committed, unpushed branch is a **successful** ending — see step 6.
+- `pre-commit` prints "Subagents are not authorized to commit. Orchestrator: prefix the command with `CORNEA_GIT_OK=1`." Read literally that is ambiguous for a dispatched worker, which is a subagent. **Carson has settled it: a worker running this skill may commit with the override.** "Orchestrator" means the orchestrated run, not one specific agent. Prefix `CORNEA_GIT_OK=1 git commit ...` and say in your report that you used it. If you ever meet a *different* guard whose text does not clearly cover the agent about to act, do not resolve it by picking the reading that unblocks you — stop and ask.
+- `pre-push` reserves the action for Carson by name: "Pushing requires explicit authorization from Carson." Setting the flag yourself to push is self-authorizing an outward-facing action the hook says is not yours to take. **Stop and ask.** Push only after Carson has authorized it in this session, and say in your report that you used the override and who authorized it. A locally committed, unpushed branch is a **successful** ending — see step 6.
 
 If a hook's text and your instructions disagree, the hook wins and you surface the conflict.
 
@@ -55,23 +55,23 @@ If a hook's text and your instructions disagree, the hook wins and you surface t
 ### 1. Survey
 
 ```bash
-/Users/taj/projs/.claude/skills/solve-issues/tracker.sh next
+/home/schmi/projs/.claude/skills/solve-issues/tracker.sh next
 ```
 
-Report the list to Taj before starting: number, priority, product, title. If he named a specific issue, work that one instead — but still claim it, and still refuse it if it is blocked or already held.
+Report the list to Carson before starting: number, priority, product, title. If he named a specific issue, work that one instead — but still claim it, and still refuse it if it is blocked or already held.
 
 Also check for abandoned work from a crashed session:
 
 ```bash
-/Users/taj/projs/.claude/skills/solve-issues/tracker.sh stale 4
+/home/schmi/projs/.claude/skills/solve-issues/tracker.sh stale 4
 ```
 
-Do not silently reclaim. Show Taj what looks abandoned and let him say.
+Do not silently reclaim. Show Carson what looks abandoned and let him say.
 
 ### 2. Claim before reading, let alone editing
 
 ```bash
-/Users/taj/projs/.claude/skills/solve-issues/tracker.sh claim <issue> "$TOKEN" || echo "skip, take the next one"
+/home/schmi/projs/.claude/skills/solve-issues/tracker.sh claim <issue> "$TOKEN" || echo "skip, take the next one"
 ```
 
 Exit 0 means the lease is yours. **Exit 1 means another session got there first — move to the next issue without comment.** Exit 2 means this session already holds an issue; see guard 3. Never work an issue you did not win.
@@ -81,17 +81,17 @@ Exit 0 means the lease is yours. **Exit 1 means another session got there first 
 Each issue has a self-contained pickup prompt in the tracker repo:
 
 ```bash
-gh api repos/CortexRND/tracker/contents/prompts --jq '.[].name' | grep "^<issue>-"
-gh api repos/CortexRND/tracker/contents/prompts/<file> -H "Accept: application/vnd.github.raw"
+gh api repos/AnsweringRND/tracker/contents/prompts --jq '.[].name' | grep "^<issue>-"
+gh api repos/AnsweringRND/tracker/contents/prompts/<file> -H "Accept: application/vnd.github.raw"
 ```
 
-**If the `grep` matches nothing, this issue has no pickup prompt** — the coverage is not guaranteed. Release the lease with that reason (`release <issue> "$TOKEN" "no pickup prompt in CortexRND/tracker/prompts"`), tell Taj the prompt is missing, and take the next issue. The issue body alone carries no `path:line` evidence and none of the doctrine that constrains the work, so building from it means inventing the scope. The single exception: your dispatch brief already carries the full scope and evidence itself — then work the brief, and say in your report that no prompt file existed.
+**If the `grep` matches nothing, this issue has no pickup prompt** — the coverage is not guaranteed. Release the lease with that reason (`release <issue> "$TOKEN" "no pickup prompt in AnsweringRND/tracker/prompts"`), tell Carson the prompt is missing, and take the next issue. The issue body alone carries no `path:line` evidence and none of the doctrine that constrains the work, so building from it means inventing the scope. The single exception: your dispatch brief already carries the full scope and evidence itself — then work the brief, and say in your report that no prompt file existed.
 
 Follow its `## Prompt` section. It carries its own context, `path:line` evidence, and the doctrine that constrains the work — it does not need the issue body.
 
 **Verify the evidence before building on it.** These prompts cite line numbers, and line numbers drift. If a cited `path:line` no longer says what the prompt claims, stop, correct it, and **record every drifted citation in the pull request body, old → new** — one issue last run had eight citations off by 4–13 lines, and that drift is a tracker bug worth reporting even though the work still shipped. If the cited code is gone rather than moved, the premise is stale: release.
 
-**If the prompt has a non-empty `## Decisions needed from Taj` section, your default is to release.** Release, quote the questions, tell Taj the `needs:taj` label is missing, and move on. The single exception: the dispatch brief you were given **names that specific question, calls it non-gating, and excludes the work it refers to from your scope**. Silence in the dispatch brief is not permission — release.
+**If the prompt has a non-empty `## Decisions needed from Carson` section, your default is to release.** Release, quote the questions, tell Carson the `needs:carson` label is missing, and move on. The single exception: the dispatch brief you were given **names that specific question, calls it non-gating, and excludes the work it refers to from your scope**. Silence in the dispatch brief is not permission — release.
 
 You do not get to decide for yourself that a question is harmless. That call was made up front by whoever dispatched you, or it was not made. An unanswered founder decision produces a confidently wrong deliverable that a reviewer may accept; a wrong release costs one re-dispatch.
 
@@ -100,7 +100,7 @@ You do not get to decide for yourself that a question is harmless. That call was
 Never work directly in the main checkout — parallel sessions share it, and one session's edits become another's phantom failures.
 
 ```bash
-cd /Users/taj/projs/cortex
+cd /home/schmi/projs/answering
 git fetch origin                                                    # dangerouslyDisableSandbox
 git worktree add ../.worktrees/issue-<n> origin/main -b agent/issue-<n>
 cd ../.worktrees/issue-<n>
@@ -108,14 +108,14 @@ npm install          # REQUIRED
 git diff --stat origin/main...HEAD                                  # must be empty
 ```
 
-**A leftover `../.worktrees/issue-<n>` or `agent/issue-<n>` means a previous session crashed there**, and `worktree add` will fail on it. Treat it exactly like step 1's abandoned work: show Taj what is in it and let him say. Two probes tell him what he is deciding about:
+**A leftover `../.worktrees/issue-<n>` or `agent/issue-<n>` means a previous session crashed there**, and `worktree add` will fail on it. Treat it exactly like step 1's abandoned work: show Carson what is in it and let him say. Two probes tell him what he is deciding about:
 
 ```bash
-git -C /Users/taj/projs/.worktrees/issue-<n> status --short
-git -C /Users/taj/projs/cortex log --oneline origin/main..agent/issue-<n>
+git -C /home/schmi/projs/.worktrees/issue-<n> status --short
+git -C /home/schmi/projs/answering log --oneline origin/main..agent/issue-<n>
 ```
 
-Once he says the leftovers go, `git worktree remove --force ../.worktrees/issue-<n>` then `git branch -D agent/issue-<n>`, and add fresh. Removing them yourself first is destroying work whose value only Taj can judge.
+Once he says the leftovers go, `git worktree remove --force ../.worktrees/issue-<n>` then `git branch -D agent/issue-<n>`, and add fresh. Removing them yourself first is destroying work whose value only Carson can judge.
 
 **Pass `origin/main` as the start-point explicitly.** Omit it and `worktree add` branches from whatever the shared checkout's HEAD happens to be — which is not `main` whenever someone has left it parked on a feature branch. That is not hypothetical: it happened to four dispatched workers in one run, and the one that did not catch it opened a pull request carrying ~15k lines of an unrelated unmerged branch behind a 5-file fix. The `git diff --stat` above is the cheap proof; run it before you write anything, and again before you push.
 
@@ -128,8 +128,8 @@ Stay inside your assigned file lane. If the fix genuinely requires touching a fi
 **Before you create a migration file, confirm its number twice:** against the number your dispatch brief handed you, and against what is already on disk here and in every sibling worktree.
 
 ```bash
-ls /Users/taj/projs/cortex/packages/cornea-authz/src/db/migrations/ \
-   /Users/taj/projs/.worktrees/*/packages/cornea-authz/src/db/migrations/ 2>/dev/null | sort -u
+ls /home/schmi/projs/answering/packages/cornea-authz/src/db/migrations/ \
+   /home/schmi/projs/.worktrees/*/packages/cornea-authz/src/db/migrations/ 2>/dev/null | sort -u
 ```
 
 Migration filenames are a shared global counter across concurrent sessions. If the brief gave you no number, or the number it gave you already exists anywhere in that listing, stop and ask before writing the file.
@@ -156,9 +156,9 @@ If tests fail, say so with the failing output. Do not describe partial work as d
 ### 6. Open a pull request, never merge
 
 ```bash
-gh pr create --repo CortexRND/cortex \
+gh pr create --repo AnsweringRND/answering \
   --title "<what changed, in behavior terms>" \
-  --body "Closes CortexRND/tracker#<n>
+  --body "Closes AnsweringRND/tracker#<n>
 
 ## What changed
 ...
@@ -167,12 +167,12 @@ gh pr create --repo CortexRND/cortex \
 ## Evidence checked
 <any path:line in the prompt that had drifted, old -> new>
 ## Deferred
-<any question from 'Decisions needed from Taj' your brief excluded from scope>"
+<any question from 'Decisions needed from Carson' your brief excluded from scope>"
 ```
 
-`gh` and the push both need `dangerouslyDisableSandbox: true`, and `git push` needs Taj's authorization for the `pre-push` override — see guard 2.
+`gh` and the push both need `dangerouslyDisableSandbox: true`, and `git push` needs Carson's authorization for the `pre-push` override — see guard 2.
 
-**If Taj has not authorized a push in this session, this is where you stop, and stopping here is success.** Commit the work locally, leave the branch unpushed, and report: the branch name, the commit sha, the test results, and the sentence "awaits push authorization from Taj — `pre-push` reserves this for him." Then release the lease with that reason (`/Users/taj/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "agent/issue-<n> committed locally, awaits push authorization"`) so nothing is held invisibly. There is no PR yet, so there is nothing to `finish` and nowhere to post a brief; the local branch and the report are the deliverable. Do not set `CORNEA_GIT_OK=1` to make the checklist below turn green.
+**If Carson has not authorized a push in this session, this is where you stop, and stopping here is success.** Commit the work locally, leave the branch unpushed, and report: the branch name, the commit sha, the test results, and the sentence "awaits push authorization from Carson — `pre-push` reserves this for him." Then release the lease with that reason (`/home/schmi/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "agent/issue-<n> committed locally, awaits push authorization"`) so nothing is held invisibly. There is no PR yet, so there is nothing to `finish` and nowhere to post a brief; the local branch and the report are the deliverable. Do not set `CORNEA_GIT_OK=1` to make the checklist below turn green.
 
 **Never merge.** The issue stays open until a human merges the pull request. One agent opening a pull request is useful; one agent merging to main unattended is how a bad change reaches everything.
 
@@ -189,13 +189,13 @@ The lease close belongs to whoever dispatched you, and it happens only after the
 **The reviewer brief is requested as its own turn**, after the PR lands. Do not write it unless you are asked. The six required sections live in [orchestrator.md](orchestrator.md); the request will quote them. When asked, write it to a file, post it, and reply with the URL:
 
 ```bash
-gh pr comment <n> --repo CortexRND/cortex -F brief.md
+gh pr comment <n> --repo AnsweringRND/answering -F brief.md
 ```
 
-Exception, and only this one: if nobody dispatched you — Taj invoked this skill directly — then you are your own orchestrator. Write the brief now, then close your own lease with both links:
+Exception, and only this one: if nobody dispatched you — Carson invoked this skill directly — then you are your own orchestrator. Write the brief now, then close your own lease with both links:
 
 ```bash
-/Users/taj/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url> — brief: <brief-comment-url>"
+/home/schmi/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url> — brief: <brief-comment-url>"
 ```
 
 The brief is the highest-value artifact of the run, which is why it gates the signal rather than trailing it. Last run's briefs surfaced a 0.8 false-answer rate under the real production gate that CI structurally cannot see, an unrelated fix buried inside a PR, 291 lines with no unit tests, and the exact boundary of an unproven security claim — none of which a diff review would have found, because only the author knows what they did not do.
@@ -213,22 +213,22 @@ Releasing applies when you stop **before a pull request exists**. If your PR is 
 Otherwise, any exit must release, or the issue stays invisibly locked:
 
 ```bash
-/Users/taj/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "blocked on X"
+/home/schmi/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "blocked on X"
 ```
 
 Release when: the prompt's premise turns out to be stale, no pickup prompt exists for the issue, the prompt raises a founder decision your brief did not clear, the scope is bigger than one issue, the branch is done but awaits push authorization, or you are stopping for any other reason. Releasing is normal and cheap. A silently held lease is not.
 
 ## Reporting back
 
-After each issue, tell Taj in one short block: the issue, what changed, the test result, the pull request link (or the unpushed branch name and what it awaits), and the brief comment link once it exists. After the run, list what was completed, what was released and why, and what is left on the frontier.
+After each issue, tell Carson in one short block: the issue, what changed, the test result, the pull request link (or the unpushed branch name and what it awaits), and the brief comment link once it exists. After the run, list what was completed, what was released and why, and what is left on the frontier.
 
 ## Before you go idle, verify
 
 - Every lease is either finished or released — nothing is silently held.
 - You have reached exactly one of these four complete endings, and none of them is a failure:
-  1. **PR open and reported** — `gh pr list --repo CortexRND/cortex --head agent/issue-<n> --json url` resolves, and your report carries the URL, real test numbers, and anything you could not exercise. The lease stays open; closing it is the orchestrator's, after the brief.
-  2. **Committed locally, unpushed** — Taj had not authorized a push. Released with that reason, and your report says it awaits his authorization.
+  1. **PR open and reported** — `gh pr list --repo AnsweringRND/answering --head agent/issue-<n> --json url` resolves, and your report carries the URL, real test numbers, and anything you could not exercise. The lease stays open; closing it is the orchestrator's, after the brief.
+  2. **Committed locally, unpushed** — Carson had not authorized a push. Released with that reason, and your report says it awaits his authorization.
   3. **Released at step 3** — the pickup prompt was missing, or its open questions gate what gets built, so no branch was ever created.
   4. **Released mid-work** — stale premise, or scope larger than one issue, with the reason stated.
 - Every number in your report came from a command you ran, and every gap in step 5's list that applies to you is stated.
-- You used no override that a hook reserves for Taj without Taj having said yes in this session.
+- You used no override that a hook reserves for Carson without Carson having said yes in this session.

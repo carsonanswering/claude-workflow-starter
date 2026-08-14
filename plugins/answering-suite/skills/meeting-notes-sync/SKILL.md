@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # meeting-notes-sync
 
-One markdown file per meeting in `/Users/taj/projs/notes/meetings/`, built from the Meet
+One markdown file per meeting in `/home/schmi/projs/notes/meetings/`, built from the Meet
 transcript in Drive plus any Slack threads about that meeting. Runs many times a
 day, so every step is idempotent: a meeting already recorded in state is never
 re-fetched, and a meeting with no transcript yet stays pending for a later run.
@@ -16,7 +16,7 @@ never load transcript bodies or Slack messages into its own context.
 
 The per-meeting procedure — transcript search, Slack context, file format, return
 object — lives in
-[`per-meeting.md`](/Users/taj/.claude/skills/meeting-notes-sync/per-meeting.md).
+[`per-meeting.md`](/home/schmi/.claude/skills/meeting-notes-sync/per-meeting.md).
 Every subagent prompt tells the worker to read that file first; open it yourself
 only on the single-pending-meeting inline branch.
 
@@ -25,7 +25,7 @@ only on the single-pending-meeting inline branch.
 ### 0. Setup
 
 - Lookback argument is optional: `48h`, `3d`, `today`. Default `24h`. Output dir
-  defaults to `/Users/taj/projs/notes/meetings/`; a path argument overrides it. State file is
+  defaults to `/home/schmi/projs/notes/meetings/`; a path argument overrides it. State file is
   `<outdir>/.state.json`.
 - Get the clock from the machine, never from memory:
 
@@ -38,7 +38,7 @@ only on the single-pending-meeting inline branch.
   missing parent directories, so a single Write to
   `<outdir>/2026-07-28-some-meeting.md` is all the setup needed. Bash in this
   skill is for `date` only. Note the default outdir lives under the project cwd
-  (`/Users/taj/projs`); if a path argument moves it outside, Bash writes there
+  (`/home/schmi/projs`); if a path argument moves it outside, Bash writes there
   are sandbox-blocked (`Operation not permitted`) while Write still works.
 - Read `<outdir>/.state.json`. If it is missing, Write it as
   `{"version": 1, "meetings": {}}`. If it exists but does not parse as JSON,
@@ -114,7 +114,7 @@ Search window start (RFC3339): <WINDOW_START>
 Output directory: <OUTDIR>
 Slack MCP tool prefix: <SLACK_PREFIX>
 
-Read /Users/taj/.claude/skills/meeting-notes-sync/per-meeting.md and follow it
+Read /home/schmi/.claude/skills/meeting-notes-sync/per-meeting.md and follow it
 exactly. Return only the JSON object it specifies, and no other text.
 ```
 
@@ -139,8 +139,8 @@ exactly. Return only the JSON object it specifies, and no other text.
     },
     "meetings": {
       "7f3k9d2m1abc4efg5hij6klmn": {
-        "title": "Cortex Brain design partner sync",
-        "output": "/Users/taj/projs/notes/meetings/2026-07-28-cortex-brain-design-partner-sync.md",
+        "title": "Answering design partner sync",
+        "output": "/home/schmi/projs/notes/meetings/2026-07-28-answering-design-partner-sync.md",
         "drive_file_id": "1AbCdEfGhIjKlMnOpQrStUvWxYz",
         "processed_at": "2026-07-28T17:04:11Z"
       }
