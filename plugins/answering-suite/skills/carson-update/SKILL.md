@@ -47,8 +47,8 @@ Establish the window first, then collect evidence:
   are not anchors. If no such message is findable, or the read fails, use the
   last 7 days and say so in the message.
 - `git log --since='<window>' --oneline --all` in each of
-  `/Users/kai/projs/meeting-copilot`, `/Users/kai/projs/answering-brief`,
-  `/Users/kai/projs/testing-framework`, `/Users/kai/projs/ai-employees`.
+  `/Users/kai/Desktop/projs/meeting-copilot`, `/Users/kai/Desktop/projs/answering-brief`,
+  `/Users/kai/Desktop/projs/testing-framework`, `/Users/kai/Desktop/projs/ai-employees`.
   Skip a repo with no commits in the window rather than reporting "no changes".
 - Count a commit as evidence only when it changed behavior, tests, or docs a
   person would care about. answering-brief commits `chore(<tool>): run <date>`

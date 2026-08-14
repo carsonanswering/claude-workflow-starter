@@ -2,7 +2,7 @@
 # Rebuild the tracker dashboard from live GitHub state. Zero LLM calls.
 # Prints one summary line; the caller publishes the `out` path.
 set -e
-LIVE=/Users/kai/projs/tracker-live
+LIVE=/Users/kai/Desktop/projs/tracker-live
 cd "$LIVE"
 ./build.sh >/dev/null 2>&1
 
@@ -10,7 +10,7 @@ URL=$(python3 -c "import json,sys;print(json.load(open('/Users/kai/.claude/skill
 
 python3 - "$URL" <<'PY'
 import json, sys, pathlib
-d = pathlib.Path('/Users/kai/projs/tracker-live')
+d = pathlib.Path('/Users/kai/Desktop/projs/tracker-live')
 data = json.loads((d / 'viz-data.json').read_text())
 wf = lambda i: any(l.startswith('wayfinder:') for l in i['l'])
 openb = lambda i: [b['n'] for b in i['b'] if b['s'] == 'OPEN']

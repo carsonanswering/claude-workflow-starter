@@ -374,6 +374,6 @@ Body: the same role sentence, rules, both worked examples, and the nonce-first
 
 There is no `--agent` flag: a promoted agent is reachable only through the `subagent` tool from a parent `pi` session, so the parent must keep extensions on (no `-ne`) **and list `subagent` in its own allowlist** (`--tools subagent`, or `--tools read,subagent`) — `--tools` filters extension tools too, so a parent running the recommended `--tools read` sees no `subagent` and the promoted agent is unreachable with no error pointing at the allowlist. The parent is itself a local call: two calls, still one at a time. The pi `subagent` parallel form (`{tasks:[...]}`, max 8, 4 concurrent) is the contention case on this substrate; leave it to `scoped-harness-fw`.
 
-Then record the agent in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/Users/kai/projs/skills/` and push.
+Then record the agent in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/Users/kai/Desktop/projs/skills/` and push.
 
 Roster, `pi-spawn` flags, prompt templates and chains: skill `pi-delegate`. Operator manual: `~/.pi/agent/README-delegation.md`. Doctrine this skill instantiates: `team-orchestration`, `frontier-orchestrator`, `lightning`, `ooda`.

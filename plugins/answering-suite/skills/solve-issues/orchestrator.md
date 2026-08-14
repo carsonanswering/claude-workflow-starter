@@ -10,7 +10,7 @@ Five concurrent workers avoided branch collisions in the last run only because t
 - **Check what branch the shared checkout is parked on, before you write a single dispatch brief**, and name `origin/main` as the explicit worktree start-point in every one of them:
 
   ```bash
-  git -C /Users/kai/projs/answering branch --show-current    # if this is not `main`, every bare `worktree add -b` inherits it
+  git -C /Users/kai/Desktop/projs/answering branch --show-current    # if this is not `main`, every bare `worktree add -b` inherits it
   ```
 
   Worker step 4 in [SKILL.md](SKILL.md) carries what a bare `worktree add -b` did to a run, and the `git diff --stat` that catches it. Three of the four workers caught it themselves; do not rely on that.
@@ -35,14 +35,14 @@ Ask for the brief as its own turn once the PR exists, quoting these six sections
 **You close the lease, not the worker, and only after you have seen the brief.** That ordering is the mechanism — `finish` enforces nothing itself, since its third argument only has to be a non-empty string. Once the brief URL exists:
 
 ```bash
-/Users/kai/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url> — brief: <brief-comment-url>"
+/Users/kai/Desktop/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url> — brief: <brief-comment-url>"
 ```
 
 The run is not complete until, for every PR opened, a brief comment exists and the lease is finished. Check it, do not ask:
 
 ```bash
 gh pr view <n> --repo AnsweringRND/answering --comments
-/Users/kai/projs/.claude/skills/solve-issues/tracker.sh stale 0     # every lease still held, at any age
+/Users/kai/Desktop/projs/.claude/skills/solve-issues/tracker.sh stale 0     # every lease still held, at any age
 ```
 
 A worker that stops with its PR open and its lease still held has done exactly what this file asks. Do not treat an open lease at that point as an abandoned issue — it is waiting on you.
@@ -60,7 +60,7 @@ git rev-parse origin/agent/issue-<n>             # failure means nothing was pus
 
 On the fourth: failure is **expected** when push authorization was withheld — check that first, and only treat it as a false report if the worker claimed a live PR.
 
-The reverse is also decidable. `/Users/kai/projs/answering/.git/hooks/pre-push` exits 1 unless `CORNEA_GIT_OK=1`, and worktrees share it, so while that hook stands, a branch that resolves on origin proves the flag **was** set. A worker reporting that it pushed without the flag is reporting something impossible; read the hook before relaying it.
+The reverse is also decidable. `/Users/kai/Desktop/projs/answering/.git/hooks/pre-push` exits 1 unless `CORNEA_GIT_OK=1`, and worktrees share it, so while that hook stands, a branch that resolves on origin proves the flag **was** set. A worker reporting that it pushed without the flag is reporting something impossible; read the hook before relaying it.
 
 **A message sent mid-task is not an interrupt.** A worker already executing acts on the brief it started with; a hold sent at 06:27 does not bind a commit made at 06:39. Before you ever report that a worker disobeyed, compare timestamps:
 

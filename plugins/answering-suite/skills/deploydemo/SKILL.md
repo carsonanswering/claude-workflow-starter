@@ -10,7 +10,7 @@ Get the Answering demo appliance running, prove every beat in the guide still
 works, patch the guide where reality has moved, and hand back the short list of
 things only a human can do.
 
-Repo: `~/projs/answering`. Guide: `docs/handoff/DEMO-PILOT.md`. Everything you run
+Repo: `~/Desktop/projs/answering`. Guide: `docs/handoff/DEMO-PILOT.md`. Everything you run
 lives under `deploy/appliance/`.
 
 ## The one rule
@@ -28,7 +28,7 @@ it.
 ## Run it
 
 ```bash
-cd ~/projs/answering/deploy/appliance
+cd ~/Desktop/projs/answering/deploy/appliance
 ./demo/verify.sh              # preflight, build, seed, run all six beats
 ./demo/verify.sh --preflight  # blockers only, changes nothing
 ./demo/verify.sh --fresh      # destroy this workspace's corpus, then rebuild

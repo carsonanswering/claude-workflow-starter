@@ -51,4 +51,4 @@ pkill -f litellm                           # stop
 - Subscription features unavailable (web login and other subscription-gated extras)
 - deepseek reasoning: TTFT p50 ~2.2s / p95 ~5.4s; quality below Claude on complex agentic work
 - Fireworks key from `~/.zshenv`; calls bill the Fireworks account
-- Full docs: `~/projs/open-sourced/README.md`
+- Full docs: `~/Desktop/projs/open-sourced/README.md`

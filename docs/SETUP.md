@@ -33,7 +33,7 @@ scripts (`tmux-fleet/fleet.sh`, `skill-sync/sync.sh`, `solve-issues/tracker.sh`,
 `tracker-refresh/refresh.sh`), so the user-wide copy is the one that has to
 exist. The plugin was the redundant half.
 
-`~/projs/.claude/skills` and `~/projs/.claude/agents` are symlinks into
+`~/Desktop/projs/.claude/skills` and `~/Desktop/projs/.claude/agents` are symlinks into
 `~/.claude`, so project-scoped lookups resolve to the same files.
 
 **After editing skills in this repo, re-run `./install.sh --user-wide`.** The
@@ -54,6 +54,26 @@ model's skill list and only run when you type them: `meeting-notes-sync`,
 `open-items`, `obsidian-log`, `oss-session`, `running-view`, `slack-insights`,
 `tmux-fleet`, `tracker-refresh`. A session reporting 24 visible suite skills
 rather than 32 is correct, not broken.
+
+## Doctrine scope
+
+Skills are user-wide, so every session gets the *tools*. The orchestration
+*doctrine* is a separate question: a `CLAUDE.md` inside this repo only loads for
+sessions whose working directory is inside it, which excludes most Orca
+worktrees and any bare ssh session.
+
+So the doctrine lives in **`~/.claude/CLAUDE.md`** — user memory, loaded in every
+session on this machine. This repo's `CLAUDE.md` keeps only repo-specific
+additions and does not duplicate it.
+
+The trade-off is deliberate: the doctrine now costs context in every session,
+including unrelated work. If that becomes a problem, cut `~/.claude/CLAUDE.md`
+back to the "Machine layout" section and move the orchestration rules into
+per-repo `CLAUDE.md` files.
+
+Verified: an Orca-spawned terminal is a login zsh (`-/bin/zsh`), so `~/.zshenv`
+applies and Orca sessions report `ORCA_CLI_COMMAND` set,
+`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, and all 32 skills.
 
 ## Shell environment
 
@@ -166,7 +186,7 @@ These skills load but fail at their dependency, not at a path:
 - `carson-update`, `slack-insights`, `comp-watch` — need a Slack MCP connection
 - `daily-brief`, `meeting-notes-sync` — need Google Workspace MCPs
 
-`~/projs` and `~/Documents/ObsidianVault` were created with the directory
-structure the skills reference. Individual project checkouts under `~/projs`
+`~/Desktop/projs` and `~/Documents/ObsidianVault` were created with the directory
+structure the skills reference. Individual project checkouts under `~/Desktop/projs`
 (`answering`, `answering-gtm`, `tracker-live`, ...) are **not** pre-seeded —
 clone them as needed.

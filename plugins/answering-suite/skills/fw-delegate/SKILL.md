@@ -45,4 +45,4 @@ Anywhere a one-shot call over text suffices — the description lists the shapes
 
 - `FIREWORKS_API_KEY not set` — prefix command with `source ~/.zshenv;`
 - `HTTP 403: error code: 1010` — Cloudflare UA block; `fw` spoofs curl UA, so script was modified
-- Full docs: `~/projs/open-sourced/README.md`
+- Full docs: `~/Desktop/projs/open-sourced/README.md`

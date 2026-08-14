@@ -13,7 +13,7 @@ The SessionEnd hook (`~/.claude/hooks/session-obsidian-log.py`) auto-logs sessio
 ## Vault location
 
 Vault: `~/Documents/ObsidianVault`
-Notes folder: `~/Documents/ObsidianVault/Claude Sessions/` — a symlink to `/Users/kai/projs/session-logs/`, so either path writes the same file.
+Notes folder: `~/Documents/ObsidianVault/Claude Sessions/` — a symlink to `/Users/kai/Desktop/projs/session-logs/`, so either path writes the same file.
 
 Write the note with the Write tool: it creates missing parent directories, and `~/Documents` sits outside the Bash write allowlist (`mkdir -p` there returns "Operation not permitted").
 
@@ -72,5 +72,5 @@ status: <completed | in-progress | blocked>
 4. **Status**: `completed` if the session's main task finished, `in-progress` if work remains, `blocked` if waiting on the user or an external factor.
 5. **Wikilinks**: before writing, `ls` the `Claude Sessions/` folder; if a prior note clearly relates (same project/topic), link it under Related. Otherwise omit the section.
 6. **Secrets**: never write API keys, tokens, passwords, or email contents into the note. Redact as `<redacted>` if they came up.
-7. **Index**: after writing the note, add one line `- [[<note name>]]` under the matching date section in `/Users/kai/projs/session-logs/Claude Sessions Index.md` (newest date section first; create the date section if missing). If that file is absent, create it with the title line `# Claude Sessions Index` and the date section under it — the same file and title the hook uses, so both writers keep one index.
+7. **Index**: after writing the note, add one line `- [[<note name>]]` under the matching date section in `/Users/kai/Desktop/projs/session-logs/Claude Sessions Index.md` (newest date section first; create the date section if missing). If that file is absent, create it with the title line `# Claude Sessions Index` and the date section under it — the same file and title the hook uses, so both writers keep one index.
 8. After writing, confirm to the user with the full note path.

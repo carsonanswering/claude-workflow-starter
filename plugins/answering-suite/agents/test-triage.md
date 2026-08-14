@@ -181,7 +181,7 @@ command: npm test
 result: not run
 failures:
   <environment>
-    error: ENV: node_modules missing in worktree /Users/kai/projs/wt/feature-x
+    error: ENV: node_modules missing in worktree /Users/kai/Desktop/projs/wt/feature-x
     likely: n/a — install dependencies inside the worktree before trusting any result
 </example>
 

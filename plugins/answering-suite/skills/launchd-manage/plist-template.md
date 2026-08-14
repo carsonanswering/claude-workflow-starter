@@ -18,7 +18,7 @@ Live examples of this exact shape: `~/Library/LaunchAgents/com.carson.answering-
   <array>
     <string>/bin/zsh</string>
     <string>-lc</string>
-    <string>cd /Users/kai/projs/PROJECT &amp;&amp; /Users/kai/.local/bin/claude -p "/SKILL" --permission-mode acceptEdits</string>
+    <string>cd /Users/kai/Desktop/projs/PROJECT &amp;&amp; /Users/kai/.local/bin/claude -p "/SKILL" --permission-mode acceptEdits</string>
   </array>
 
   <key>StartCalendarInterval</key>
@@ -28,9 +28,9 @@ Live examples of this exact shape: `~/Library/LaunchAgents/com.carson.answering-
   </dict>
 
   <key>StandardOutPath</key>
-  <string>/Users/kai/projs/PROJECT/logs/JOB.log</string>
+  <string>/Users/kai/Desktop/projs/PROJECT/logs/JOB.log</string>
   <key>StandardErrorPath</key>
-  <string>/Users/kai/projs/PROJECT/logs/JOB.err.log</string>
+  <string>/Users/kai/Desktop/projs/PROJECT/logs/JOB.err.log</string>
 
   <key>RunAtLoad</key>
   <false/>
@@ -44,7 +44,7 @@ Key by key:
 - **`ProgramArguments`** — exactly three elements: `/bin/zsh`, `-lc`, and one command string. The `-l` makes it a login shell so `~/.zshenv` is sourced and the API keys exist; `-c` alone gives the job an empty environment. Absolute paths only — `~` and `$HOME` are unexpanded inside the XML, and `claude` is not on launchd's `PATH`, hence `/Users/kai/.local/bin/claude`.
 - **`&amp;&amp;`** — XML escaping for `&&`. A literal `&&` makes the file unparseable and `plutil -lint` fails.
 - **`--permission-mode acceptEdits`** — the run is headless, so a permission prompt would hang until the next reboot.
-- **`StandardOutPath` / `StandardErrorPath`** — under the job's own project, `PROJECT/logs/`, matching the live jobs (`/Users/kai/projs/answering-brief/logs/`). Keep stdout and stderr separate here so a stack trace is not interleaved with skill output. `mkdir -p` the directory before loading.
+- **`StandardOutPath` / `StandardErrorPath`** — under the job's own project, `PROJECT/logs/`, matching the live jobs (`/Users/kai/Desktop/projs/answering-brief/logs/`). Keep stdout and stderr separate here so a stack trace is not interleaved with skill output. `mkdir -p` the directory before loading.
 - **`RunAtLoad`** — `false` for scheduled jobs, so bootstrapping during setup does not silently kick off a real run; you fire it deliberately with `kickstart`.
 
 ## Shape B — a shell script on an interval
@@ -55,14 +55,14 @@ Live example: `~/Library/LaunchAgents/com.answeringrnd.tracker-refresh.plist`.
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/kai/projs/PROJECT/SCRIPT.sh</string>
+    <string>/Users/kai/Desktop/projs/PROJECT/SCRIPT.sh</string>
   </array>
 
   <key>StartInterval</key><integer>900</integer>
   <key>RunAtLoad</key><true/>
 
-  <key>StandardOutPath</key><string>/Users/kai/projs/PROJECT/refresh.log</string>
-  <key>StandardErrorPath</key><string>/Users/kai/projs/PROJECT/refresh.log</string>
+  <key>StandardOutPath</key><string>/Users/kai/Desktop/projs/PROJECT/refresh.log</string>
+  <key>StandardErrorPath</key><string>/Users/kai/Desktop/projs/PROJECT/refresh.log</string>
 
   <key>EnvironmentVariables</key>
   <dict><key>PATH</key><string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string></dict>

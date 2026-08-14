@@ -243,7 +243,7 @@ perl -e 'alarm 120; exec @ARGV' \
 pi -p --provider fireworks --model fireworks/gpt-oss-120b \
   --append-system-prompt "$H" \
   --tools read -nc -ns -ne --no-session \
-  "Find the bug in /Users/kai/projs/<your-file>.py. Symptom: <the observed wrong behaviour>." \
+  "Find the bug in /Users/kai/Desktop/projs/<your-file>.py. Symptom: <the observed wrong behaviour>." \
   > "$OUT/bugfind.txt" 2> "$OUT/bugfind.err" < /dev/null
 cat "$OUT/bugfind.txt"
 ```
@@ -448,8 +448,8 @@ Body: the single responsibility, the rules, the guardrails, the nonce-first
 `STATUS:`-bearing output contract, and one worked example per STATUS value.
 ```
 
-Once promoted it is callable by name through the `subagent` tool from a parent pi session — the only route in, since there is no `--agent` flag. The parent must keep extensions on (no `-ne`) **and** list `subagent` in its own allowlist, or the promoted agent is unreachable with no error pointing at the allowlist. Record it in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/Users/kai/projs/skills/` and push.
+Once promoted it is callable by name through the `subagent` tool from a parent pi session — the only route in, since there is no `--agent` flag. The parent must keep extensions on (no `-ne`) **and** list `subagent` in its own allowlist, or the promoted agent is unreachable with no error pointing at the allowlist. Record it in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/Users/kai/Desktop/projs/skills/` and push.
 
 ## Reference
 
-Roster, `pi-spawn` flags, prompt templates and chains: skill `pi-delegate`. Operator manual: `~/.pi/agent/README-delegation.md` (mirrored at `/Users/kai/projs/skills/pi-delegation/`) — read it before changing a roster agent's allowlist or model, and note its own warning that none of its timings are rigorously benchmarked. No-tools one-shot text work: `fw-delegate`. Same harness on your own GPU, zero marginal cost, serial queue: `scoped-harness-local` — read as a pair with this file; the contract shape, the escalation cost table and the stdin stall are shared findings. Fan-out wider than this file covers — phase caching, `{scriptPath, resumeFromRunId}` replay, supervision probes: `frontier-orchestrator`.
+Roster, `pi-spawn` flags, prompt templates and chains: skill `pi-delegate`. Operator manual: `~/.pi/agent/README-delegation.md` (mirrored at `/Users/kai/Desktop/projs/skills/pi-delegation/`) — read it before changing a roster agent's allowlist or model, and note its own warning that none of its timings are rigorously benchmarked. No-tools one-shot text work: `fw-delegate`. Same harness on your own GPU, zero marginal cost, serial queue: `scoped-harness-local` — read as a pair with this file; the contract shape, the escalation cost table and the stdin stall are shared findings. Fan-out wider than this file covers — phase caching, `{scriptPath, resumeFromRunId}` replay, supervision probes: `frontier-orchestrator`.

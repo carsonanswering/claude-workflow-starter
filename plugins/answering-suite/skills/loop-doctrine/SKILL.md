@@ -3,7 +3,7 @@ name: loop-doctrine
 description: Operating doctrine for autonomous loop sessions. Use at the start of any /loop run, overnight agent fleet, or long autonomous session, and when the user says "loop doctrine" or "run the loop".
 ---
 
-> Evidence base: `~/projs/loop-studies/04-loop-doctrine-v2.md` and
+> Evidence base: `~/Desktop/projs/loop-studies/04-loop-doctrine-v2.md` and
 > `08-night-summary.md` (2026-07-19 experiment night, 12 experiments).
 > Tools ship in `tools/` beside this file. Rules cite the experiment that
 > validated them; a rule with no citation is doctrine, not measurement.

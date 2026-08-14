@@ -31,11 +31,11 @@ localStorage — refresh regenerates list, prunes done ids no longer present.
 ## Rescan flow (user asks "rescan" / list feels stale)
 
 Spawn ONE `caveman:cavecrew-investigator` (haiku) to sweep git repos under
-~/projs (unmerged branches, dirty trees, ahead-of-remote) + memory index
+~/Desktop/projs (unmerged branches, dirty trees, ahead-of-remote) + memory index
 `/Users/kai/.claude/projects/-home-schmi-projs/memory/MEMORY.md`; diff its
 findings against items.json, apply updates, then Refresh flow. The sweep is done
 when every repo carrying an unmerged branch, a dirty tree, or unpushed commits is
 either represented by an item or explicitly judged not worth one — say which in
 the reply. Keep the sweep inside that agent so the frontier session pays only for
 the diff. New pickup prompts go through the `prompt-engineer` agent into
-`/Users/kai/projs/prompts/open-tasks/` (CLAUDE.md rule).
+`/Users/kai/Desktop/projs/prompts/open-tasks/` (CLAUDE.md rule).

@@ -35,13 +35,13 @@ In parallel:
   post that open items are as of that date. Sections map straight through in
   either file: `you` → actionable, `blocked` → waiting, `idea` → ignore in the
   day plan.
-- **Local repo state** — which branch runs is decided by whether `~/projs`
+- **Local repo state** — which branch runs is decided by whether `~/Desktop/projs`
   exists on this host.
 
-  *Local run — `~/projs` exists.* Sweep every repo under it:
+  *Local run — `~/Desktop/projs` exists.* Sweep every repo under it:
 
   ```bash
-  for d in ~/projs/*/; do
+  for d in ~/Desktop/projs/*/; do
     [ -d "$d/.git" ] || continue
     printf '%s: ' "$(basename "$d")"
     git -C "$d" log --oneline --since=yesterday.midnight | wc -l | tr -d ' '
@@ -50,7 +50,7 @@ In parallel:
   done
   ```
 
-  *Bare checkout — no `~/projs`.* Carson's other repos are not cloned here, so
+  *Bare checkout — no `~/Desktop/projs`.* Carson's other repos are not cloned here, so
   cover this repo alone and carry the gap into step 4 as a skipped lane rather
   than guessing at the rest:
 

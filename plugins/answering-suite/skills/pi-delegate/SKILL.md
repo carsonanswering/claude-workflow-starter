@@ -132,4 +132,4 @@ Valid tool names: `read`, `grep`, `find`, `ls`, `bash`, `edit`, `write`. Anythin
 
 ## Reference
 
-Full operator manual: `~/.pi/agent/README-delegation.md`, mirrored to the shared team repo at `/Users/kai/projs/skills/pi-delegation/`.
+Full operator manual: `~/.pi/agent/README-delegation.md`, mirrored to the shared team repo at `/Users/kai/Desktop/projs/skills/pi-delegation/`.

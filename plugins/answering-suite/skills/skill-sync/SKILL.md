@@ -5,7 +5,7 @@ description: Sync new or updated skills, agents and hooks into the AnsweringRND/
 
 # skill-sync
 
-`sync.sh` does every copy, guard and push. Run it instead of hand-typing `cp`/`git` — the hand-typed ritual is what this skill retires, and a skill that never reaches `/Users/kai/projs/skills` exists on this laptop only.
+`sync.sh` does every copy, guard and push. Run it instead of hand-typing `cp`/`git` — the hand-typed ritual is what this skill retires, and a skill that never reaches `/Users/kai/Desktop/projs/skills` exists on this laptop only.
 
 ## Sync
 
@@ -22,7 +22,7 @@ Done when the script prints `pushed=<sha> items=<n> branch=main`, or `no-change 
 2. Confirm the push landed, from outside the script:
 
 ```bash
-git -C /Users/kai/projs/skills status -sb | head -1
+git -C /Users/kai/Desktop/projs/skills status -sb | head -1
 ```
 
 Done when that line reads `## main...origin/main` with no `[ahead N]` marker.
@@ -33,7 +33,7 @@ Done when every name the script printed appears in your reply and the hash match
 
 ## Trio check only
 
-`day-plan`, `daily-brief` and `comp-watch` live at both `/Users/kai/.claude/skills/<name>` and `/Users/kai/projs/answering-brief/.claude/skills/<name>` and must stay byte-identical. To answer "have those copies drifted?" without touching git:
+`day-plan`, `daily-brief` and `comp-watch` live at both `/Users/kai/.claude/skills/<name>` and `/Users/kai/Desktop/projs/answering-brief/.claude/skills/<name>` and must stay byte-identical. To answer "have those copies drifted?" without touching git:
 
 ```bash
 bash /Users/kai/.claude/skills/skill-sync/sync.sh --check-trio
@@ -46,4 +46,4 @@ Done when it prints `trio identical=3`, or exits 1 having named each differing f
 - **1** — `--check-trio` found drift. Report the named files; resolution is the exit-3 case below.
 - **2** — refused. The message names the offender: runtime state in the repo, an unknown or ambiguous name, or a share repo pointing at the wrong remote or branch. Fix that one thing and rerun.
 - **3** — trio drift blocks the sync. Show Carson the diff and ask which side is authoritative; overwriting one copy of a mirrored pair is his call, not yours. Then rerun step 1.
-- **4** — the commit did not reach origin, because origin holds commits this checkout lacks. Show Carson `git -C /Users/kai/projs/skills log --oneline HEAD..origin/main` and ask before rebasing, merging or forcing anything.
+- **4** — the commit did not reach origin, because origin holds commits this checkout lacks. Show Carson `git -C /Users/kai/Desktop/projs/skills log --oneline HEAD..origin/main` and ask before rebasing, merging or forcing anything.

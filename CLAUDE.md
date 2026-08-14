@@ -15,20 +15,21 @@ Answering.com's complete Claude workflow suite: one repo that turns a fresh mach
 
 The flagship entry point is the `workflow-starter` skill: give it a goal ("/workflow-starter ship a demo voice agent for a dental office") and it scopes a task DAG, spawns named teammates, supervises under doctrine, and QA-gates every completion. For direct control, plain language works too: "Spawn three teammates to ...".
 
-## Doctrine (applies to every session in this repo)
+## Doctrine
 
-- Delegate by default. Broad searches, multi-file verification, test-suite runs, and 3+ independent lookups go to subagents or teammates — read `team-orchestration` before running a fleet; `frontier-orchestrator` covers model/cost choices for fan-outs; `loop-doctrine` governs autonomous loops.
-- A worker's completion message is a claim, not a fact. Verify through `workflow-qa` or `claim-verifier` before relaying anything upward.
-- Retell JSON is never delivered unvalidated: `python3 plugins/answering-suite/skills/retell/scripts/validate_retell.py <file>` must pass first. Engine first, then agent; prompts/tools/states live on the engine, voice/webhooks/analysis on the agent.
+The orchestration doctrine (delegate by default, a worker's completion is a claim not a fact, disjoint file ownership, never ship unvalidated Retell JSON) lives in `~/.claude/CLAUDE.md` so it applies to **every** session on this machine — Orca worktrees and ssh/tmux sessions included, not just ones opened inside this repo. It is deliberately not duplicated here.
+
+Repo-specific additions:
+
 - ai-employees runs go through uv: `uv run --project apps/ai-employees python -m ai_employees --help`. Every run ends with a standup naming who did what and why.
-- Teammates own disjoint file sets. Two teammates in one file is a scoping bug — fix the DAG, not the merge.
+- The in-repo copy of the Retell validator is `plugins/answering-suite/skills/retell/scripts/validate_retell.py`; the installed copy the doctrine cites is `~/.claude/skills/retell/scripts/validate_retell.py`. They are the same file — edit here, then `./install.sh --user-wide`.
 
 ## Machine notes
 
-This machine is `Kais-Mac-mini` (macOS 26.3, arm64) — the designated multi-agent workstation. Paths were retargeted from the original Linux host to `/Users/kai` on 2026-08-14.
+This machine is `Kais-Mac-mini` (macOS 26.3, arm64) — the designated multi-agent workstation. Deployed 2026-08-14; paths retargeted from the original Linux host. Full record in `docs/SETUP.md`.
 
-- **Skill source of truth** is `~/.claude/skills` (32 skills, copied user-wide by `install.sh --user-wide`). `~/projs/.claude/skills` and `~/projs/.claude/agents` are symlinks into it, so `solve-issues`' `tracker.sh` and friends resolve. After editing skills in this repo, re-run `./install.sh --user-wide` or the copies go stale.
-- **Working tree** for skill-referenced projects is `~/projs` (notes/meetings, session-logs, prompts, atlas/gen, wt, .worktrees). Individual project checkouts under it are created on demand, not pre-seeded.
+- **Skill source of truth** is `~/.claude/skills` (32) and `~/.claude/agents` (11), installed by `install.sh --user-wide`. The `answering-suite` plugin is intentionally *not* installed — running both double-listed all 24 model-invocable skills. **After editing skills here, re-run `./install.sh --user-wide`** or the copies go stale silently.
+- **Working tree** is `~/Desktop/projs` — Orca's registered folder. `~/Desktop/projs/.claude/{skills,agents}` symlink into `~/.claude`, so project-scoped lookups and script paths like `solve-issues`' `tracker.sh` resolve. Individual project checkouts under it are created on demand, not pre-seeded.
 - **Available**: tmux, uv, node, gh (authed as `carsonanswering`), Orca.app, Claude Code 2.1.232.
-- **Not available on this machine** — these skills load but will fail at the dependency, not at a path: `fw-delegate` (no `fw` CLI), `pi-delegate` (no `~/.pi` harness), `lightning`/`local-delegate` (expect `lo`). Slack-flavored skills (`carson-update`, `slack-insights`, `comp-watch`) and Google-flavored ones (`daily-brief`, `meeting-notes-sync`) need their MCP connections attached to the session.
-- `orchestration` and `orca-cli` resolve the Orca binary via `ORCA_CLI_COMMAND` (exported in `~/.zshrc` → `/Applications/Orca.app/Contents/Resources/bin/orca`).
+- **Not available on this machine** — these skills load but fail at the dependency, not at a path: `fw-delegate` (no `fw` CLI), `pi-delegate` (no `~/.pi` harness), `lightning`/`local-delegate` (expect `lo`). Slack-flavored skills (`carson-update`, `slack-insights`, `comp-watch`) and Google-flavored ones (`daily-brief`, `meeting-notes-sync`) need their MCP connections attached to the session.
+- Environment lives in `~/.zshenv` (not `.zshrc`) so non-interactive `ssh host <cmd>` gets it: `ORCA_CLI_COMMAND`, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, Homebrew and `~/.local/bin` on PATH.
