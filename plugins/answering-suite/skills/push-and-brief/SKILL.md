@@ -73,7 +73,7 @@ in a command or URL he can act on, and all three headers are present.
 
 ## 4. Reconcile the tracker
 
-Read `/home/schmi/.claude/skills/open-items/items.json` and compare its `you`
+Read `/Users/kai/.claude/skills/open-items/items.json` and compare its `you`
 entries against your Needs-you lines. Drift runs both ways: a Needs-you line with
 no entry, or an entry this push just closed.
 

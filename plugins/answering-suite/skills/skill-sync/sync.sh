@@ -12,18 +12,18 @@
 
 set -o pipefail
 
-REPO=/home/schmi/projs/skills
+REPO=/Users/kai/projs/skills
 REMOTE_URL=https://github.com/AnsweringRND/skills.git
 BRANCH=main
 
-SKILL_ROOTS="/home/schmi/.claude/skills /home/schmi/projs/.claude/skills"
-AGENT_ROOTS="/home/schmi/.claude/agents /home/schmi/projs/.claude/agents"
-HOOK_ROOTS="/home/schmi/.claude/hooks /home/schmi/projs/.claude/hooks"
+SKILL_ROOTS="/Users/kai/.claude/skills /Users/kai/projs/.claude/skills"
+AGENT_ROOTS="/Users/kai/.claude/agents /Users/kai/projs/.claude/agents"
+HOOK_ROOTS="/Users/kai/.claude/hooks /Users/kai/projs/.claude/hooks"
 
 # day-plan, daily-brief and comp-watch exist at both of these and must stay byte-identical.
 TRIO_NAMES="day-plan daily-brief comp-watch"
-TRIO_USER=/home/schmi/.claude/skills
-TRIO_PROJ=/home/schmi/projs/answering-brief/.claude/skills
+TRIO_USER=/Users/kai/.claude/skills
+TRIO_PROJ=/Users/kai/projs/answering-brief/.claude/skills
 
 RSYNC_EX=(--exclude='*state.json' --exclude='items.json' --exclude='out/' \
           --exclude='*.log' --exclude='__pycache__/' --exclude='*.pyc' \

@@ -9,9 +9,9 @@ Two research lanes for the Answering pre-seed (AnsweringRND org, targeted ~3 mon
 
 Two rules bind every run.
 
-**Every row is sourced.** A row carries a URL to a **primary** page — the company's own announcement, a filing, a fund page, or a dated article. A search-engine AI overview is not a source: on 2026-07-31 a Basis Set "Agentic Memory Track" taken from a search summary became a tracker ticket and turned out not to exist (`/home/schmi/projs/answering-gtm/HANDOFF-2026-08-01.md`). An unsourced row is dropped, not softened to "reportedly".
+**Every row is sourced.** A row carries a URL to a **primary** page — the company's own announcement, a filing, a fund page, or a dated article. A search-engine AI overview is not a source: on 2026-07-31 a Basis Set "Agentic Memory Track" taken from a search summary became a tracker ticket and turned out not to exist (`/Users/kai/projs/answering-gtm/HANDOFF-2026-08-01.md`). An unsourced row is dropped, not softened to "reportedly".
 
-**Every self-claim carries a verdict.** A statement about what Answering does reaches an outbound draft only after it maps to a verified id in `/home/schmi/projs/answering-raise/claims/ledger.json` or `claim-verifier` returns SUPPORTED against the repo. Everything else stays under `## Unverified — internal only` in the targets file. The v1 one-pager shipped four claims that failed a code truth-check on 2026-07-25 — confidence tiers, a freshness SLA, speaker-level provenance, and an MCP server — all four false against the repo (`/home/schmi/projs/answering-raise/README.md`).
+**Every self-claim carries a verdict.** A statement about what Answering does reaches an outbound draft only after it maps to a verified id in `/Users/kai/projs/answering-raise/claims/ledger.json` or `claim-verifier` returns SUPPORTED against the repo. Everything else stays under `## Unverified — internal only` in the targets file. The v1 one-pager shipped four claims that failed a code truth-check on 2026-07-25 — confidence tiers, a freshness SLA, speaker-level provenance, and an MCP server — all four false against the repo (`/Users/kai/projs/answering-raise/README.md`).
 
 ## 1. Scope the ask into lanes
 
@@ -19,9 +19,9 @@ Name which lanes this ask needs; a request for only comparables or only targets 
 
 Read the prior art before dispatching anything, so the agents research forward instead of re-deriving:
 
-- `/home/schmi/projs/answering-gtm/research/round-benchmarks.md` — lane A prior art: pre-seed size, instrument, cap and timeline benchmarks.
-- `/home/schmi/projs/answering-gtm/research/investor-targets.md` — lane B prior art: a **verified conflict map** plus an unverified candidate list. It contains no ranked target list; that pass was blocked on search budget.
-- `/home/schmi/projs/answering-gtm/research/vc-landscape.md` — the earlier landscape sweep.
+- `/Users/kai/projs/answering-gtm/research/round-benchmarks.md` — lane A prior art: pre-seed size, instrument, cap and timeline benchmarks.
+- `/Users/kai/projs/answering-gtm/research/investor-targets.md` — lane B prior art: a **verified conflict map** plus an unverified candidate list. It contains no ranked target list; that pass was blocked on search budget.
+- `/Users/kai/projs/answering-gtm/research/vc-landscape.md` — the earlier landscape sweep.
 
 Then write down two things both lanes are matched against:
 
@@ -69,7 +69,7 @@ Done when: both agents have returned, every row is in schema with a URL, every s
 
 ## 3. Write the dated targets file
 
-Write `/home/schmi/projs/answering-gtm/raise/<YYYY-MM-DD>-targets.md`, creating `raise/` if it is absent. If a file already carries today's date, ask before overwriting — it may be another session's pass.
+Write `/Users/kai/projs/answering-gtm/raise/<YYYY-MM-DD>-targets.md`, creating `raise/` if it is absent. If a file already carries today's date, ask before overwriting — it may be another session's pass.
 
 Sections, in order:
 
@@ -85,8 +85,8 @@ Done when: every row in both tables ends in a source URL, every step-2 sub-query
 
 A research run stops at step 3. Drafting starts when the user asks for an email, DM, or intro request — and every factual sentence about Answering passes the verdict gate first:
 
-1. **Check the ledger.** `cd /home/schmi/projs/answering-raise && python3 bin/ledger.py check "<sentence>"`. `claims/ledger.json` is the source of truth for what an email may assert; a mapped claim goes out in the ledger's own wording.
-2. **Unmapped claims go to `claim-verifier`**, with the claim list and repo paths `/home/schmi/projs/meeting-copilot` and `/home/schmi/projs/answering`. SUPPORTED goes out as stated. PARTIAL goes out only in the narrower form the verdict names. UNSUPPORTED and CONTRADICTED go to the `Unverified` section and stay internal.
+1. **Check the ledger.** `cd /Users/kai/projs/answering-raise && python3 bin/ledger.py check "<sentence>"`. `claims/ledger.json` is the source of truth for what an email may assert; a mapped claim goes out in the ledger's own wording.
+2. **Unmapped claims go to `claim-verifier`**, with the claim list and repo paths `/Users/kai/projs/meeting-copilot` and `/Users/kai/projs/answering`. SUPPORTED goes out as stated. PARTIAL goes out only in the narrower form the verdict names. UNSUPPORTED and CONTRADICTED go to the `Unverified` section and stay internal.
 3. **Editing `claims/ledger.json` is Carson's call** — adding a claim, or any change that would make a held draft pass, stops and asks.
 
 Then open [`outreach.md`](outreach.md) for the skeletons, the routing between them, and the send-side bars.

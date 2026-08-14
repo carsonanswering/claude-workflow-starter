@@ -25,5 +25,10 @@ The flagship entry point is the `workflow-starter` skill: give it a goal ("/work
 
 ## Machine notes
 
-- Some Answering skills reference `/home/schmi/...` paths (obsidian-log, meeting-notes-sync, tracker-refresh, open-items, fw-delegate, pi-delegate, launchd-manage, push-and-brief, carson-update, repo-atlas, raise-research, frontier-orchestrator's dispatch notes). They run after you retarget those paths — see README "Path caveats".
-- `orchestration` and `orca-cli` skills expect the Orca binary; `tmux-fleet` and split-pane teams expect tmux. Slack-flavored skills (carson-update, slack-insights, comp-watch) need a Slack MCP connection.
+This machine is `Kais-Mac-mini` (macOS 26.3, arm64) — the designated multi-agent workstation. Paths were retargeted from the original Linux host to `/Users/kai` on 2026-08-14.
+
+- **Skill source of truth** is `~/.claude/skills` (32 skills, copied user-wide by `install.sh --user-wide`). `~/projs/.claude/skills` and `~/projs/.claude/agents` are symlinks into it, so `solve-issues`' `tracker.sh` and friends resolve. After editing skills in this repo, re-run `./install.sh --user-wide` or the copies go stale.
+- **Working tree** for skill-referenced projects is `~/projs` (notes/meetings, session-logs, prompts, atlas/gen, wt, .worktrees). Individual project checkouts under it are created on demand, not pre-seeded.
+- **Available**: tmux, uv, node, gh (authed as `carsonanswering`), Orca.app, Claude Code 2.1.232.
+- **Not available on this machine** — these skills load but will fail at the dependency, not at a path: `fw-delegate` (no `fw` CLI), `pi-delegate` (no `~/.pi` harness), `lightning`/`local-delegate` (expect `lo`). Slack-flavored skills (`carson-update`, `slack-insights`, `comp-watch`) and Google-flavored ones (`daily-brief`, `meeting-notes-sync`) need their MCP connections attached to the session.
+- `orchestration` and `orca-cli` resolve the Orca binary via `ORCA_CLI_COMMAND` (exported in `~/.zshrc` → `/Applications/Orca.app/Contents/Resources/bin/orca`).

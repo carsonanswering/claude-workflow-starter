@@ -38,7 +38,7 @@ Those skills read their per-repo config from `docs/agents/` — `issue-tracker.m
 
 ## Caveats
 
-- Several skills and hooks reference absolute paths under `/home/schmi/` (Obsidian vault, `fw` CLI, project checkouts). Adjust paths for your machine before use.
+- Several skills and hooks reference absolute paths under `/Users/kai/` (Obsidian vault, `fw` CLI, project checkouts). Adjust paths for your machine before use.
 - `open-items` and `running-view` keep runtime state (`items.json`, `state.json`, `out/`) that is intentionally not committed here — the skills create their own on first run.
 - Some skills depend on connected MCP servers (Slack, Google Calendar/Gmail/Drive) being available in your Claude Code session.
 

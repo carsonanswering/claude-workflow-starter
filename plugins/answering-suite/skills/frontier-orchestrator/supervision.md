@@ -44,11 +44,11 @@ gh pr comment N --repo <owner/repo> -F <file>.md
 
 **Close the lease yourself, last, and only after the deliverable exists.** The lease is the only signal that tells another session an issue is done rather than abandoned, and a worker that closes it before the write-up lands has published "finished" over incomplete work — which is exactly what happens when the closing step sits inside a work brief the worker is already exhausted by. Before declaring a run complete, list what you still hold and confirm each one is either finished with a PR or released with a stated reason. An issue silently held is invisible to every other session.
 
-*Worked example (cornea run):* the lease helper is `/home/schmi/projs/.claude/skills/solve-issues/tracker.sh`, and `$TOKEN` is the per-session token that skill has you generate once at the start of a run (`TOKEN="s-$(date +%s)-$RANDOM"`) and reuse for every lease command.
+*Worked example (cornea run):* the lease helper is `/Users/kai/projs/.claude/skills/solve-issues/tracker.sh`, and `$TOKEN` is the per-session token that skill has you generate once at the start of a run (`TOKEN="s-$(date +%s)-$RANDOM"`) and reuse for every lease command.
 
 ```
-/home/schmi/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url>"
-/home/schmi/projs/.claude/skills/solve-issues/tracker.sh stale 0     # every lease outstanding right now
+/Users/kai/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url>"
+/Users/kai/projs/.claude/skills/solve-issues/tracker.sh stale 0     # every lease outstanding right now
 ```
 
 Hold `finish` in your own hands and run it after you have seen the comment URL. The helper only requires the PR argument to be a non-empty string, so it enforces nothing on its own: the ordering is the mechanism, not the script.

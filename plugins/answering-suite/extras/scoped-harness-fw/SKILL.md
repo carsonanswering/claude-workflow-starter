@@ -18,8 +18,8 @@ A weak model fails on **unbounded choice**, not on bounded execution. A scoped h
 **Every Bash call that touches `~/.pi/` needs `dangerouslyDisableSandbox: true`** — the `mkdir`, the heredoc that writes the harness, the `pi` and `tmux` calls, the log greps, and `ps`/`pgrep`. The sandbox's write allowlist covers `$TMPDIR`, `/tmp/claude` and the cwd, not `~/.pi`. Two different errors both mean "sandbox", not "broken install":
 
 ```
-EPERM: operation not permitted, mkdir '/home/schmi/.pi/agent/settings.json.lock'
-mkdir: /home/schmi/.pi/agent/harnesses: Operation not permitted
+EPERM: operation not permitted, mkdir '/Users/kai/.pi/agent/settings.json.lock'
+mkdir: /Users/kai/.pi/agent/harnesses: Operation not permitted
 ```
 
 **The Write tool cannot reach `~/.pi` either.** Write harness files with a `cat > "$H" <<'EOF'` heredoc inside an unsandboxed Bash call.
@@ -183,8 +183,8 @@ Write the harness to **one fixed absolute path** and reference that same literal
 
 ```bash
 mkdir -p ~/.pi/agent/harnesses ~/.pi/agent/logs/harness-runs   # once; needs dangerouslyDisableSandbox
-H=/home/schmi/.pi/agent/harnesses/bugfind.md
-OUT=/home/schmi/.pi/agent/logs/harness-runs/$(date +%Y%m%d-%H%M%S)-bugfind   # session-scoped; see below
+H=/Users/kai/.pi/agent/harnesses/bugfind.md
+OUT=/Users/kai/.pi/agent/logs/harness-runs/$(date +%Y%m%d-%H%M%S)-bugfind   # session-scoped; see below
 mkdir -p "$OUT"
 cat > "$H" <<'EOF'
 You find the single bug in one named file and report it. You never edit.
@@ -236,14 +236,14 @@ test -s "$H" || echo "MISSING HARNESS: $H"
 Dispatch it (`dangerouslyDisableSandbox: true`, Bash `timeout` 600000 as the outer cap):
 
 ```bash
-H=/home/schmi/.pi/agent/harnesses/bugfind.md
-OUT=/home/schmi/.pi/agent/logs/harness-runs/$(date +%Y%m%d-%H%M%S)-bugfind; mkdir -p "$OUT"
+H=/Users/kai/.pi/agent/harnesses/bugfind.md
+OUT=/Users/kai/.pi/agent/logs/harness-runs/$(date +%Y%m%d-%H%M%S)-bugfind; mkdir -p "$OUT"
 test -s "$H" || { echo "MISSING HARNESS: $H"; exit 1; }   # a missing path is appended as literal text
 perl -e 'alarm 120; exec @ARGV' \
 pi -p --provider fireworks --model fireworks/gpt-oss-120b \
   --append-system-prompt "$H" \
   --tools read -nc -ns -ne --no-session \
-  "Find the bug in /home/schmi/projs/<your-file>.py. Symptom: <the observed wrong behaviour>." \
+  "Find the bug in /Users/kai/projs/<your-file>.py. Symptom: <the observed wrong behaviour>." \
   > "$OUT/bugfind.txt" 2> "$OUT/bugfind.err" < /dev/null
 cat "$OUT/bugfind.txt"
 ```
@@ -325,8 +325,8 @@ You decompose and you synthesize; harnesses do everything in between. Never spaw
 
 - *Independent `pi -p` processes* — **the only shape that carries a one-off harness**, and the measured 3.77x. Background each one and `wait`; one output file per worker, never a shared stdout, because interleaved returns cannot be attributed. Index the filenames (`basename` alone collides: `tests/api/test_client.py` and `tests/worker/test_client.py` write the same file and the second silently wins) and **scope `$OUT` to this batch** — a fixed directory with `$i`-indexed names restarting at 1 every batch collides with the last batch and with every other session.
   ```bash
-  H=/home/schmi/.pi/agent/harnesses/bugfind.md
-  OUT=/home/schmi/.pi/agent/logs/harness-runs/$(date +%Y%m%d-%H%M%S)-$$; mkdir -p "$OUT"
+  H=/Users/kai/.pi/agent/harnesses/bugfind.md
+  OUT=/Users/kai/.pi/agent/logs/harness-runs/$(date +%Y%m%d-%H%M%S)-$$; mkdir -p "$OUT"
   test -s "$H" || { echo "MISSING HARNESS: $H"; exit 1; }
   i=0
   for f in /abs/a.py /abs/b.py /abs/c.py /abs/d.py; do
@@ -404,7 +404,7 @@ You decompose and you synthesize; harnesses do everything in between. Never spaw
 | A sweep brief forces you to invent a symptom per file | The symptom-driven bugfind template applied to a "find defects we haven't found yet" sweep | Use the no-symptom variant: defect-class predicate plus an ESCALATE trigger on "zero, or two equally defensible" |
 | Nothing in the sweep notices that file A's test asserts file B's buggy behaviour | `Read only the file named in the task` + `Report exactly one defect` — correct fan-out defaults with this exact cost | Plan a second pass with a two-file brief, or do the cross-file reasoning yourself |
 | `pgrep -lf 'pi -p'` reports live workers that do not exist | `-f` matches every `/bin/zsh -c …` wrapper whose command string contains the flags — measured 4 phantom workers against zero real ones | `pgrep -f <harness-file>.md` for inline runs; `pi-spawn -l` or `tmux has-session -t pi-<name>` for detached, which `pgrep` cannot see at all |
-| `EPERM ... mkdir '/home/schmi/.pi/agent/settings.json.lock'`, or `mkdir: /home/schmi/.pi/agent/harnesses: Operation not permitted` | The sandbox denies writes under `~/.pi`; not a broken install | `dangerouslyDisableSandbox: true` on every Bash call touching `~/.pi` |
+| `EPERM ... mkdir '/Users/kai/.pi/agent/settings.json.lock'`, or `mkdir: /Users/kai/.pi/agent/harnesses: Operation not permitted` | The sandbox denies writes under `~/.pi`; not a broken install | `dangerouslyDisableSandbox: true` on every Bash call touching `~/.pi` |
 | The Write tool fails writing the harness file | `~/.pi` is outside the write allowlist (cwd, `$TMPDIR`, `/tmp/claude`) | `cat > "$H" <<'EOF'` heredoc inside an unsandboxed Bash call |
 | Fluent, contract-free prose, no `NONCE:` line, exit 0 | The `--append-system-prompt` path did not exist, so pi appended the path **as literal text** (`resource-loader.js:15-28`) | `test -s "$H"` in the same Bash call as the dispatch — mandatory for any harness with `edit`/`write`, since the nonce only tells you afterwards; never build the path from `$$` |
 | Contract-shaped output, right diagnosis, only the final line missing | The model truncated the tail — the harness DID load | Put `NONCE:` first; do not go path-hunting |
@@ -448,8 +448,8 @@ Body: the single responsibility, the rules, the guardrails, the nonce-first
 `STATUS:`-bearing output contract, and one worked example per STATUS value.
 ```
 
-Once promoted it is callable by name through the `subagent` tool from a parent pi session — the only route in, since there is no `--agent` flag. The parent must keep extensions on (no `-ne`) **and** list `subagent` in its own allowlist, or the promoted agent is unreachable with no error pointing at the allowlist. Record it in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/home/schmi/projs/skills/` and push.
+Once promoted it is callable by name through the `subagent` tool from a parent pi session — the only route in, since there is no `--agent` flag. The parent must keep extensions on (no `-ne`) **and** list `subagent` in its own allowlist, or the promoted agent is unreachable with no error pointing at the allowlist. Record it in `pi-delegate`'s roster table so the next session finds it, and per CLAUDE.md copy it into `/Users/kai/projs/skills/` and push.
 
 ## Reference
 
-Roster, `pi-spawn` flags, prompt templates and chains: skill `pi-delegate`. Operator manual: `~/.pi/agent/README-delegation.md` (mirrored at `/home/schmi/projs/skills/pi-delegation/`) — read it before changing a roster agent's allowlist or model, and note its own warning that none of its timings are rigorously benchmarked. No-tools one-shot text work: `fw-delegate`. Same harness on your own GPU, zero marginal cost, serial queue: `scoped-harness-local` — read as a pair with this file; the contract shape, the escalation cost table and the stdin stall are shared findings. Fan-out wider than this file covers — phase caching, `{scriptPath, resumeFromRunId}` replay, supervision probes: `frontier-orchestrator`.
+Roster, `pi-spawn` flags, prompt templates and chains: skill `pi-delegate`. Operator manual: `~/.pi/agent/README-delegation.md` (mirrored at `/Users/kai/projs/skills/pi-delegation/`) — read it before changing a roster agent's allowlist or model, and note its own warning that none of its timings are rigorously benchmarked. No-tools one-shot text work: `fw-delegate`. Same harness on your own GPU, zero marginal cost, serial queue: `scoped-harness-local` — read as a pair with this file; the contract shape, the escalation cost table and the stdin stall are shared findings. Fan-out wider than this file covers — phase caching, `{scriptPath, resumeFromRunId}` replay, supervision probes: `frontier-orchestrator`.

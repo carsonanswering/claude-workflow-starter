@@ -9,7 +9,7 @@ One ritual, run the same way every time, for a recurring job on **this machine**
 
 Scope: launchd is for work that needs this Mac — local git repos, local MCP auth, files on this disk. A routine that only touches the web belongs in the cloud `schedule` skill, which keeps firing with the laptop shut.
 
-`answering-brief`'s per-tool local-vs-cloud split lives in `/home/schmi/projs/answering-brief/SCHEDULING.md`; its install snippet predates this skill, so where the two differ the ritual below wins.
+`answering-brief`'s per-tool local-vs-cloud split lives in `/Users/kai/projs/answering-brief/SCHEDULING.md`; its install snippet predates this skill, so where the two differ the ritual below wins.
 
 ## The ritual
 

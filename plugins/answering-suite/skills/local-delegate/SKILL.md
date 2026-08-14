@@ -6,7 +6,7 @@ description: >-
 
 # local-delegate — one-shot work that stays on the machine
 
-`lo` (`/home/schmi/.local/bin/lo`) makes a single Ollama call and prints the assistant text. Python stdlib, no auth, talks to `http://localhost:11434` (`OLLAMA_HOST` overrides). Local sibling of `fw-delegate`: local wins on privacy, offline, zero marginal cost, and no rate limit — `fw` wins on quality.
+`lo` (`/Users/kai/.local/bin/lo`) makes a single Ollama call and prints the assistant text. Python stdlib, no auth, talks to `http://localhost:11434` (`OLLAMA_HOST` overrides). Local sibling of `fw-delegate`: local wins on privacy, offline, zero marginal cost, and no rate limit — `fw` wins on quality.
 
 ## Invocation
 

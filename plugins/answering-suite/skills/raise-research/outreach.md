@@ -4,7 +4,7 @@
 
 ## Route to the right template
 
-The email skeletons already exist in `/home/schmi/projs/answering-raise/templates/` and are enforced by `bin/gate.py`. Use them; do not re-invent a shape here.
+The email skeletons already exist in `/Users/kai/projs/answering-raise/templates/` and are enforced by `bin/gate.py`. Use them; do not re-invent a shape here.
 
 | Situation | Template |
 |---|---|
@@ -44,7 +44,7 @@ Bounds: 45 words or fewer, one claim, no link on the first message, no amount or
 Run the truth gate over the drafts:
 
 ```bash
-cd /home/schmi/projs/answering-raise
+cd /Users/kai/projs/answering-raise
 python3 bin/gate.py --all              # denylist, claim mapping, hook resolution, adversarial judge
 python3 bin/gate.py --all --no-judge   # checks 1-3, offline
 ```

@@ -9,7 +9,7 @@ Work the AnsweringRND/tracker frontier autonomously, without colliding with anot
 
 Everything in this file binds the **worker** — the session doing one issue. Dispatching workers instead of working an issue yourself? Read [orchestrator.md](orchestrator.md) before writing any brief — token rules, lane partition, requesting the brief, closing the lease.
 
-Helper: `/home/schmi/projs/.claude/skills/solve-issues/tracker.sh`. Every invocation below spells out that absolute path, because step 4 moves you into a worktree that has no `.claude` of its own. All commands assume it is executable and that `gh` is authenticated.
+Helper: `/Users/kai/projs/.claude/skills/solve-issues/tracker.sh`. Every invocation below spells out that absolute path, because step 4 moves you into a worktree that has no `.claude` of its own. All commands assume it is executable and that `gh` is authenticated.
 
 ## The concurrency problem, and why the lease exists
 
@@ -41,7 +41,7 @@ Three guards exist in this repo. All three look like failures when you first hit
 
 **1. Sandboxed network calls fail TLS.** `gh` and every git network operation fail inside the sandbox with `tls: failed to verify certificate: x509: OSStatus -26276`. The sandbox's certificate store cannot verify GitHub. Run **those calls only** with `dangerouslyDisableSandbox: true` — `gh` commands, `tracker.sh` (it is a `gh` wrapper), `git push`, `git fetch`. Keep everything else sandboxed: builds, tests, and edits have no reason to leave the machine, and a blanket disable removes the guard from the operations that actually need it.
 
-**2. Git hooks gate commit and push on `CORNEA_GIT_OK=1`.** `/home/schmi/projs/answering/.git/hooks/pre-commit` and `.../pre-push` exist and may be added or changed mid-session. Worktrees share these hooks with the main checkout. **Read the hook before using any override you were told about** — the two hooks say different things and grant different authority:
+**2. Git hooks gate commit and push on `CORNEA_GIT_OK=1`.** `/Users/kai/projs/answering/.git/hooks/pre-commit` and `.../pre-push` exist and may be added or changed mid-session. Worktrees share these hooks with the main checkout. **Read the hook before using any override you were told about** — the two hooks say different things and grant different authority:
 
 - `pre-commit` prints "Subagents are not authorized to commit. Orchestrator: prefix the command with `CORNEA_GIT_OK=1`." Read literally that is ambiguous for a dispatched worker, which is a subagent. **Carson has settled it: a worker running this skill may commit with the override.** "Orchestrator" means the orchestrated run, not one specific agent. Prefix `CORNEA_GIT_OK=1 git commit ...` and say in your report that you used it. If you ever meet a *different* guard whose text does not clearly cover the agent about to act, do not resolve it by picking the reading that unblocks you — stop and ask.
 - `pre-push` reserves the action for Carson by name: "Pushing requires explicit authorization from Carson." Setting the flag yourself to push is self-authorizing an outward-facing action the hook says is not yours to take. **Stop and ask.** Push only after Carson has authorized it in this session, and say in your report that you used the override and who authorized it. A locally committed, unpushed branch is a **successful** ending — see step 6.
@@ -55,7 +55,7 @@ If a hook's text and your instructions disagree, the hook wins and you surface t
 ### 1. Survey
 
 ```bash
-/home/schmi/projs/.claude/skills/solve-issues/tracker.sh next
+/Users/kai/projs/.claude/skills/solve-issues/tracker.sh next
 ```
 
 Report the list to Carson before starting: number, priority, product, title. If he named a specific issue, work that one instead — but still claim it, and still refuse it if it is blocked or already held.
@@ -63,7 +63,7 @@ Report the list to Carson before starting: number, priority, product, title. If 
 Also check for abandoned work from a crashed session:
 
 ```bash
-/home/schmi/projs/.claude/skills/solve-issues/tracker.sh stale 4
+/Users/kai/projs/.claude/skills/solve-issues/tracker.sh stale 4
 ```
 
 Do not silently reclaim. Show Carson what looks abandoned and let him say.
@@ -71,7 +71,7 @@ Do not silently reclaim. Show Carson what looks abandoned and let him say.
 ### 2. Claim before reading, let alone editing
 
 ```bash
-/home/schmi/projs/.claude/skills/solve-issues/tracker.sh claim <issue> "$TOKEN" || echo "skip, take the next one"
+/Users/kai/projs/.claude/skills/solve-issues/tracker.sh claim <issue> "$TOKEN" || echo "skip, take the next one"
 ```
 
 Exit 0 means the lease is yours. **Exit 1 means another session got there first — move to the next issue without comment.** Exit 2 means this session already holds an issue; see guard 3. Never work an issue you did not win.
@@ -100,7 +100,7 @@ You do not get to decide for yourself that a question is harmless. That call was
 Never work directly in the main checkout — parallel sessions share it, and one session's edits become another's phantom failures.
 
 ```bash
-cd /home/schmi/projs/answering
+cd /Users/kai/projs/answering
 git fetch origin                                                    # dangerouslyDisableSandbox
 git worktree add ../.worktrees/issue-<n> origin/main -b agent/issue-<n>
 cd ../.worktrees/issue-<n>
@@ -111,8 +111,8 @@ git diff --stat origin/main...HEAD                                  # must be em
 **A leftover `../.worktrees/issue-<n>` or `agent/issue-<n>` means a previous session crashed there**, and `worktree add` will fail on it. Treat it exactly like step 1's abandoned work: show Carson what is in it and let him say. Two probes tell him what he is deciding about:
 
 ```bash
-git -C /home/schmi/projs/.worktrees/issue-<n> status --short
-git -C /home/schmi/projs/answering log --oneline origin/main..agent/issue-<n>
+git -C /Users/kai/projs/.worktrees/issue-<n> status --short
+git -C /Users/kai/projs/answering log --oneline origin/main..agent/issue-<n>
 ```
 
 Once he says the leftovers go, `git worktree remove --force ../.worktrees/issue-<n>` then `git branch -D agent/issue-<n>`, and add fresh. Removing them yourself first is destroying work whose value only Carson can judge.
@@ -128,8 +128,8 @@ Stay inside your assigned file lane. If the fix genuinely requires touching a fi
 **Before you create a migration file, confirm its number twice:** against the number your dispatch brief handed you, and against what is already on disk here and in every sibling worktree.
 
 ```bash
-ls /home/schmi/projs/answering/packages/cornea-authz/src/db/migrations/ \
-   /home/schmi/projs/.worktrees/*/packages/cornea-authz/src/db/migrations/ 2>/dev/null | sort -u
+ls /Users/kai/projs/answering/packages/cornea-authz/src/db/migrations/ \
+   /Users/kai/projs/.worktrees/*/packages/cornea-authz/src/db/migrations/ 2>/dev/null | sort -u
 ```
 
 Migration filenames are a shared global counter across concurrent sessions. If the brief gave you no number, or the number it gave you already exists anywhere in that listing, stop and ask before writing the file.
@@ -172,7 +172,7 @@ gh pr create --repo AnsweringRND/answering \
 
 `gh` and the push both need `dangerouslyDisableSandbox: true`, and `git push` needs Carson's authorization for the `pre-push` override — see guard 2.
 
-**If Carson has not authorized a push in this session, this is where you stop, and stopping here is success.** Commit the work locally, leave the branch unpushed, and report: the branch name, the commit sha, the test results, and the sentence "awaits push authorization from Carson — `pre-push` reserves this for him." Then release the lease with that reason (`/home/schmi/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "agent/issue-<n> committed locally, awaits push authorization"`) so nothing is held invisibly. There is no PR yet, so there is nothing to `finish` and nowhere to post a brief; the local branch and the report are the deliverable. Do not set `CORNEA_GIT_OK=1` to make the checklist below turn green.
+**If Carson has not authorized a push in this session, this is where you stop, and stopping here is success.** Commit the work locally, leave the branch unpushed, and report: the branch name, the commit sha, the test results, and the sentence "awaits push authorization from Carson — `pre-push` reserves this for him." Then release the lease with that reason (`/Users/kai/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "agent/issue-<n> committed locally, awaits push authorization"`) so nothing is held invisibly. There is no PR yet, so there is nothing to `finish` and nowhere to post a brief; the local branch and the report are the deliverable. Do not set `CORNEA_GIT_OK=1` to make the checklist below turn green.
 
 **Never merge.** The issue stays open until a human merges the pull request. One agent opening a pull request is useful; one agent merging to main unattended is how a bad change reaches everything.
 
@@ -195,7 +195,7 @@ gh pr comment <n> --repo AnsweringRND/answering -F brief.md
 Exception, and only this one: if nobody dispatched you — Carson invoked this skill directly — then you are your own orchestrator. Write the brief now, then close your own lease with both links:
 
 ```bash
-/home/schmi/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url> — brief: <brief-comment-url>"
+/Users/kai/projs/.claude/skills/solve-issues/tracker.sh finish <issue> "$TOKEN" "<pr-url> — brief: <brief-comment-url>"
 ```
 
 The brief is the highest-value artifact of the run, which is why it gates the signal rather than trailing it. Last run's briefs surfaced a 0.8 false-answer rate under the real production gate that CI structurally cannot see, an unrelated fix buried inside a PR, 291 lines with no unit tests, and the exact boundary of an unproven security claim — none of which a diff review would have found, because only the author knows what they did not do.
@@ -213,7 +213,7 @@ Releasing applies when you stop **before a pull request exists**. If your PR is 
 Otherwise, any exit must release, or the issue stays invisibly locked:
 
 ```bash
-/home/schmi/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "blocked on X"
+/Users/kai/projs/.claude/skills/solve-issues/tracker.sh release <issue> "$TOKEN" "blocked on X"
 ```
 
 Release when: the prompt's premise turns out to be stale, no pickup prompt exists for the issue, the prompt raises a founder decision your brief did not clear, the scope is bigger than one issue, the branch is done but awaits push authorization, or you are stopping for any other reason. Releasing is normal and cheap. A silently held lease is not.

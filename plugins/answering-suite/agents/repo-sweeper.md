@@ -33,7 +33,7 @@ this once, in the header line, so nobody treats stale numbers as fact.
 
 ## Input
 
-- **root** — optional. Default `/home/schmi/projs`.
+- **root** — optional. Default `/Users/kai/projs`.
 - **depth** — optional. Default: find repos at the root's immediate children and
   one level of nesting below them (e.g. both `answering/` and
   `testing-framework/agentest/` are found). If the caller gives a depth, honor it.
@@ -62,7 +62,7 @@ find "$DIR" -maxdepth 2 \( -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name
 ```
 
 Non-empty result = flag it in "needs attention" as `no version control`. As of this
-writing `/home/schmi/projs/callcopilot` is exactly this case; confirm rather than
+writing `/Users/kai/projs/callcopilot` is exactly this case; confirm rather than
 assume, since it may have been initialized since.
 
 ## Step 2 — gather per repo
@@ -134,7 +134,7 @@ stop — do not promote a minor detail just to have something to say.
 Everything quiet. Two repos, both clean and current.
 
 ```
-2 repos under /home/schmi/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
+2 repos under /Users/kai/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
 
 | repo | branch | dirty | ahead/behind | remote | unmerged | last commit |
 |---|---|---|---|---|---|---|
@@ -149,7 +149,7 @@ Needs attention: all clean
 The common messy case — unpushed work, a remote-less repo, a stale repo.
 
 ```
-4 repos under /home/schmi/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
+4 repos under /Users/kai/projs · ahead/behind vs last local fetch (no fetch run) · 2026-07-30
 
 | repo | branch | dirty | ahead/behind | remote | unmerged | last commit |
 |---|---|---|---|---|---|---|

@@ -73,9 +73,9 @@ From the Answering suite (in the plugin): web-researcher, claim-verifier, prompt
 
 ## 9. Caveats you should actually read
 
-**Machine-specific paths.** These Answering skills reference `/home/schmi/...` (Obsidian vault, `fw` CLI, project checkouts) and need retargeting before first use on your machine: carson-update, tracker-refresh, push-and-brief, obsidian-log, open-items, pi-delegate, repo-atlas, launchd-manage, fw-delegate, meeting-notes-sync, raise-research, and frontier-orchestrator's dispatch notes. Search: `grep -rl "/home/schmi" plugins/`.
+**Machine-specific paths.** The suite was authored on a Linux host and referenced `/home/schmi/...` throughout (Obsidian vault, `fw` CLI, project checkouts). As of 2026-08-14 those are retargeted to `/Users/kai` for the Mac mini deployment. If you deploy this on a *different* machine, re-run the same rewrite: `grep -rl "/Users/kai" plugins/` then sed to your own home. Remember to re-run `./install.sh --user-wide` afterward — the `~/.claude` copies do not update themselves.
 
-**External dependencies.** `orchestration` and `orca-cli` require the Orca binary; `tmux-fleet` and split-pane teams require tmux; carson-update / slack-insights / comp-watch expect a Slack MCP connection; daily-brief and meeting-notes-sync expect Google Workspace MCPs; `carson-update` posts Carson's progress update to their cofounder in #code-updates.
+**External dependencies.** `orchestration` and `orca-cli` require the Orca binary; `tmux-fleet` and split-pane teams require tmux; carson-update / slack-insights / comp-watch expect a Slack MCP connection; daily-brief and meeting-notes-sync expect Google Workspace MCPs; `carson-update` posts Carson's progress update to their cofounder in #code-updates. `fw-delegate`, `pi-delegate`, `lightning`, and `local-delegate` expect the `fw` / `pi` / `lo` CLIs, which are Answering-internal and not present on the Mac mini.
 
 **Extras don't auto-load.** `plugins/answering-suite/extras/` holds the Answering hooks (session logging, self-improve, auto-title, usage dashboard), statusline, pi-delegation prompts, and scoped harnesses. They're inert until you wire them — see `extras/hooks/README.md`.
 
